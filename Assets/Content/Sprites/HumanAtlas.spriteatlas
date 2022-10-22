@@ -1,0 +1,67 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &4343727234628468602
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: HumanAtlas
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 1
+      compressionQuality: 50
+      maxTextureSize: 2048
+      textureCompression: 0
+      filterMode: 0
+      generateMipMaps: 0
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings:
+    - serializedVersion: 3
+      m_BuildTarget: DefaultTexturePlatform
+      m_MaxTextureSize: 2048
+      m_ResizeAlgorithm: 0
+      m_TextureFormat: -1
+      m_TextureCompression: 0
+      m_CompressionQuality: 50
+      m_CrunchedCompression: 0
+      m_AllowsAlphaSplitting: 0
+      m_Overridden: 0
+      m_AndroidETC2FallbackOverride: 0
+      m_ForceMaximumCompressionQuality_BC6H_BC7: 0
+    packingSettings:
+      serializedVersion: 2
+      padding: 2
+      blockOffset: 1
+      allowAlphaSplitting: 0
+      enableRotation: 0
+      enableTightPacking: 0
+      enableAlphaDilation: 0
+    secondaryTextureSettings: {}
+    variantMultiplier: 1
+    packables:
+    - {fileID: 102900000, guid: 90ac1e8bf4cf37c44afdc6bc4af088ee, type: 3}
+    - {fileID: 102900000, guid: 70ff25e17e05df2479a09da83af3616c, type: 3}
+    bindAsDefault: 1
+    isAtlasV2: 0
+    cachedData: {fileID: 0}
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300000, guid: 060e0cf1e796be540ba26475d0a30360, type: 3}
+  - {fileID: 21300000, guid: 24a114725c2819a4bae34b3068cb953a, type: 3}
+  - {fileID: 21300000, guid: 0aa1ef593c907dd47bc810d5acb570fa, type: 3}
+  - {fileID: 21300000, guid: 1c35a3e98a880314fa98f7438c3a72f6, type: 3}
+  - {fileID: 21300000, guid: ac7bfc7f58d4ce94b888b838aaf32e0e, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - Elf_attack_hair
+  - human_default_walk_body
+  - human_default_walk_hair
+  - Elf_attack_outfit
+  - Elf_attack_body
+  m_RenderDataMap: {}
+  m_Tag: HumanAtlas
+  m_IsVariant: 0
