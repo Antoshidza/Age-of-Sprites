@@ -61,8 +61,7 @@ namespace NSprites
                         (
                             renderData.data.ID,
                             renderData.data.Material,
-                            renderData.data.PropertiesSet.PropertiesNames,
-                            capacityStep: 100
+                            renderData.data.PropertiesSet.PropertiesNames
                         );
                         _registeredIDsSet.Add(renderData.data.ID);
                     }

@@ -10,8 +10,8 @@ namespace NSprites
 
         public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
         {
-            dstManager.AddComponentData(entity, new MainTexST { value = Utils.GetTextureST(_sprite) });
-            dstManager.AddComponentData(entity, new MainTexSTInitial { value = Utils.GetTextureST(_sprite) });
+            dstManager.AddComponentData(entity, new MainTexST { value = NSpritesUtils.GetTextureST(_sprite) });
+            dstManager.AddComponentData(entity, new MainTexSTInitial { value = NSpritesUtils.GetTextureST(_sprite) });
         }
     }
 }

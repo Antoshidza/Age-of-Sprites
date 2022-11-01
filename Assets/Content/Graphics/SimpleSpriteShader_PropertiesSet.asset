@@ -13,8 +13,10 @@ MonoBehaviour:
   m_Name: SimpleSpriteShader_PropertiesSet
   m_EditorClassIdentifier: 
   PropertiesNames:
+  - _propertyPointers
   - _mainTexSTBuffer
   - _sortingIndexBuffer
   - _positionBuffer
   - _pivotBuffer
   - _heightWidthBuffer
+  - _colorBuffer

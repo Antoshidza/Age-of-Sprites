@@ -53,18 +53,21 @@
             SAMPLER(sampler_MainTex);
 
 #if defined(UNITY_INSTANCING_ENABLED) || defined(UNITY_PROCEDURAL_INSTANCING_ENABLED) || defined(UNITY_STEREO_INSTANCING_ENABLED)
+            StructuredBuffer<int> _propertyPointers;
             StructuredBuffer<float4> _mainTexSTBuffer;
             StructuredBuffer<int> _sortingIndexBuffer;
             StructuredBuffer<float2> _positionBuffer;
             StructuredBuffer<float2> _pivotBuffer;
             StructuredBuffer<float2> _heightWidthBuffer;
+            StructuredBuffer<float4> _colorBuffer;
 #endif
 
             void setup()
             {
 #if defined(UNITY_INSTANCING_ENABLED) || defined(UNITY_PROCEDURAL_INSTANCING_ENABLED) || defined(UNITY_STEREO_INSTANCING_ENABLED)
-                float2 scale = _heightWidthBuffer[unity_InstanceID];
-                float2 renderPos = _positionBuffer[unity_InstanceID] - scale * _pivotBuffer[unity_InstanceID];
+                int propertyIndex = _propertyPointers[unity_InstanceID];
+                float2 scale = _heightWidthBuffer[propertyIndex];
+                float2 renderPos = _positionBuffer[propertyIndex] - scale * _pivotBuffer[propertyIndex];
                 unity_ObjectToWorld = half4x4
                 (
                     scale.x, 0, 0, renderPos.x,
@@ -84,8 +87,9 @@
                 Varyings varyings = (Varyings)0;
 
 #if defined(UNITY_INSTANCING_ENABLED) || defined(UNITY_PROCEDURAL_INSTANCING_ENABLED) || defined(UNITY_STEREO_INSTANCING_ENABLED)
-                float4 mainTexST = _mainTexSTBuffer[instanceID];
-                int sortingIndex = _sortingIndexBuffer[instanceID];
+                int propertyIndex = _propertyPointers[instanceID];
+                float4 mainTexST = _mainTexSTBuffer[propertyIndex];
+                int sortingIndex = _sortingIndexBuffer[propertyIndex];
 #else
                 float4 mainTexST = float4(1, 1, 0, 0);
                 int sortingIndex = 0;
@@ -106,7 +110,13 @@
                 half4 texColor = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, varyings.uv);
                 clip(texColor.w - 0.5);
 
+#if defined(UNITY_INSTANCING_ENABLED) || defined(UNITY_PROCEDURAL_INSTANCING_ENABLED) || defined(UNITY_STEREO_INSTANCING_ENABLED)
+                int propertyIndex = _propertyPointers[instanceID];
+                float4 color = _colorBuffer[propertyIndex];
+                return texColor * color;
+#else
                 return texColor;
+#endif
             }
             ENDHLSL
         }

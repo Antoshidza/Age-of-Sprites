@@ -183,7 +183,8 @@ namespace NSprites
             };
             var gatherSortingDataHandle = gatherSortingDataJob.ScheduleParallelByRef(_sortingSpritesQuery, state.Dependency);
 
-            //TODO: sort simple array of indexes instead, because SortingData is to large to copy
+            // TODO: sort simple array of indexes instead, because SortingData is to large to copy
+            // TODO: optimize sorting by splitting screen on N squares, where N is number of threads
             var sortHandle = new SortArrayJob<SortingData, SortingData.GeneralComparer>
             {
                 array = sortingDataArray,
