@@ -12,11 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f114ff8e49e845d4bacdac67b12b8b31, type: 3}
   m_Name: SimpleSpriteShader_PropertiesSet
   m_EditorClassIdentifier: 
-  PropertiesNames:
-  - _propertyPointers
-  - _mainTexSTBuffer
-  - _sortingIndexBuffer
-  - _positionBuffer
-  - _pivotBuffer
-  - _heightWidthBuffer
-  - _colorBuffer
+  propertiesRawData:
+  - propertyName: _mainTexSTBuffer
+    updateMode: 2
+  - propertyName: _sortingIndexBuffer
+    updateMode: 0
+  - propertyName: _positionBuffer
+    updateMode: 0
+  - propertyName: _pivotBuffer
+    updateMode: 2
+  - propertyName: _heightWidthBuffer
+    updateMode: 2
+  - propertyName: _colorBuffer
+    updateMode: 0

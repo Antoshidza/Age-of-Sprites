@@ -25,7 +25,6 @@ namespace NSprites
         public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
         {
             dstManager.AddSpriteRenderComponents(entity);
-            _ = dstManager.AddComponentData(entity, new SpriteRendererTag());
             _ = dstManager.AddComponentData(entity, new SpriteSortingIndex());
             _ = dstManager.AddComponentData(entity, new Pivot { value = _pivot });
             _ = dstManager.AddComponentData(entity, new Scale2D { value = new float2(_sprite.bounds.size.x, _sprite.bounds.size.y) * scale });

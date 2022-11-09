@@ -24,7 +24,7 @@ namespace NSprites
 
             var ecbDisableRendering = _ecbSystem.CreateCommandBuffer().AsParallelWriter();
             var disableHandle = Entities
-                .WithAll<SpriteRendererTag>()
+                .WithAll<SpriteRenderID>()
                 .WithNone<CullSpriteTag>()
                 .ForEach((Entity entity, int entityInQueryIndex, in WorldPosition2D worldPosition, in Scale2D size, in Pivot pivot) =>
                 {
@@ -35,7 +35,7 @@ namespace NSprites
 
             var ecbEnableRendering = _ecbSystem.CreateCommandBuffer().AsParallelWriter();
             var enableHandle = Entities
-                .WithAll<SpriteRendererTag>()
+                .WithAll<SpriteRenderID>()
                 .WithAll<CullSpriteTag>()
                 .ForEach((Entity entity, int entityInQueryIndex, in WorldPosition2D worldPosition, in Scale2D size, in Pivot pivot) =>
                 {

@@ -14,7 +14,7 @@ public partial class SpawnSpriteSystem : SystemBase
         _spritePrefabQuery = GetEntityQuery
         (
             ComponentType.ReadOnly<Prefab>(),
-            ComponentType.ReadOnly<SpriteRendererTag>(),
+            ComponentType.ReadOnly<SpriteRenderID>(),
             ComponentType.Exclude<Parent2D>()
         );
         _rand = new Unity.Mathematics.Random(1u);

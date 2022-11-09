@@ -367,7 +367,7 @@ MonoBehaviour:
   _overrideSpriteTexture: 1
   _pivot:
     x: 0.5
-    y: 0.5
+    y: 0
 --- !u!114 &1589399780938169317
 MonoBehaviour:
   m_ObjectHideFlags: 0

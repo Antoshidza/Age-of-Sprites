@@ -61,16 +61,12 @@ namespace NSprites
                         (
                             renderData.data.ID,
                             renderData.data.Material,
-                            renderData.data.PropertiesSet.PropertiesNames
+                            renderData.data.PropertiesSet.PropertyData
                         );
-                        _registeredIDsSet.Add(renderData.data.ID);
+                        _ = _registeredIDsSet.Add(renderData.data.ID);
                     }
 
-                    EntityManager.SetSharedComponentData
-                    (
-                        entity,
-                        new SpriteRenderID{ id = renderData.data.ID }
-                    );
+                    EntityManager.SetSharedComponentData(entity,new SpriteRenderID{ id = renderData.data.ID });
                 }
             }
             Registrate(_renderArchetypeToRegistrateQuery.ToEntityArray(Allocator.Temp));

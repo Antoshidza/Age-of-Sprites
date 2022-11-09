@@ -152,7 +152,6 @@ namespace NSprites
         {
             _sortingSpritesQuery = state.GetEntityQuery
             (
-                ComponentType.ReadOnly<SpriteRendererTag>(),
                 ComponentType.ReadOnly<SpriteRenderID>(),
 
                 ComponentType.ReadOnly<WorldPosition2D>(),
