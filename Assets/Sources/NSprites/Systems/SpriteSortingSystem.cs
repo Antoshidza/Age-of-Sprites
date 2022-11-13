@@ -20,10 +20,7 @@ namespace NSprites
                 public int Compare(SortingData x, SortingData y)
                 {
                     //can be rewrited with if statement
-                    return x.groupSortingIndex.CompareTo(y.groupSortingIndex) * -32 //less index -> later in render
-                        + x.groupPosition.CompareTo(y.groupPosition) * 16
-                        + x.groupID.CompareTo(y.groupID) * 8
-                        + x.sortingIndex.CompareTo(y.sortingIndex) * -4 //less index -> later in render
+                    return x.sortingIndex.CompareTo(y.sortingIndex) * -4 //less index -> later in render
                         + x.position.y.CompareTo(y.position.y) * 2
                         + x.id.CompareTo(y.id);
                 }
@@ -33,17 +30,14 @@ namespace NSprites
             public int chunkIndex;
 
             public int id;
-            public int groupID;
 
             public int sortingIndex;
-            public int groupSortingIndex;
 
             public float2 position;
-            public float groupPosition;
 #if UNITY_EDITOR
             public override string ToString()
             {
-                return $"id: {id}, groupID: {groupID}, groupIndex: {groupSortingIndex}, groupPos: {groupPosition}, sortIndex: {sortingIndex}, pos: {position}";
+                return $"id: {id}, sortIndex: {sortingIndex}, pos: {position}";
             }
 #endif
         }
@@ -56,34 +50,16 @@ namespace NSprites
             [ReadOnly] public EntityTypeHandle entityTypeHandle;
             [ReadOnly] public ComponentTypeHandle<WorldPosition2D> worldPosition2D_CTH;
             [ReadOnly] public ComponentDataFromEntity<WorldPosition2D> worldPosition2D_CDFE;
-            [ReadOnly] public ComponentTypeHandle<SortingGroup> sortingGroup_CTH;
-            [ReadOnly] public ComponentDataFromEntity<SortingGroup> sortingGroup_CDFE;
             [WriteOnly][NativeDisableContainerSafetyRestriction] public NativeSlice<SortingData> sortingDataArray;
 
             public void Execute(ArchetypeChunk batchInChunk, int chunkIndex, int indexOfFirstEntityInQuery)
             {
                 var entityArray = batchInChunk.GetNativeArray(entityTypeHandle);
                 var worldPosition2DArray = batchInChunk.GetNativeArray(worldPosition2D_CTH);
-                var sortingGroupArray = batchInChunk.GetNativeArray(sortingGroup_CTH);
                 for (int entityIndex = 0; entityIndex < entityArray.Length; entityIndex++)
                 {
                     var entity = entityArray[entityIndex];
-                    var sortingGroup = sortingGroupArray[entityIndex];
                     var position = worldPosition2DArray[entityIndex].value;
-
-                    float groupPosition;
-                    int groupSortingIndex;
-                    //means it's root entity
-                    if (sortingGroup.groupID == entity)
-                    {
-                        groupPosition = position.y;
-                        groupSortingIndex = sortingGroup.index;
-                    }
-                    else
-                    {
-                        groupPosition = worldPosition2D_CDFE[sortingGroup.groupID].value.y;
-                        groupSortingIndex = sortingGroup_CDFE[sortingGroup.groupID].index;
-                    }
 
                     sortingDataArray[indexOfFirstEntityInQuery + entityIndex] = new SortingData
                     {
@@ -91,13 +67,7 @@ namespace NSprites
                         chunkIndex = chunkIndex,
 
                         position = position,
-
-                        id = entity.Index,
-                        sortingIndex = sortingGroup.index,
-
-                        groupID = sortingGroup.groupID.Index,
-                        groupPosition = groupPosition,
-                        groupSortingIndex = groupSortingIndex,
+                        id = entity.Index
                     };
                 }
             }
@@ -155,7 +125,6 @@ namespace NSprites
                 ComponentType.ReadOnly<SpriteRenderID>(),
 
                 ComponentType.ReadOnly<WorldPosition2D>(),
-                ComponentType.ReadOnly<SortingGroup>(),
 
                 ComponentType.ReadOnly<SpriteSortingIndex>()
             );
@@ -176,8 +145,6 @@ namespace NSprites
                 entityTypeHandle = state.GetEntityTypeHandle(),
                 worldPosition2D_CTH = state.GetComponentTypeHandle<WorldPosition2D>(true),
                 worldPosition2D_CDFE = state.GetComponentDataFromEntity<WorldPosition2D>(true),
-                sortingGroup_CTH = state.GetComponentTypeHandle<SortingGroup>(true),
-                sortingGroup_CDFE = state.GetComponentDataFromEntity<SortingGroup>(true),
                 sortingDataArray = sortingDataArray
             };
             var gatherSortingDataHandle = gatherSortingDataJob.ScheduleParallelByRef(_sortingSpritesQuery, state.Dependency);

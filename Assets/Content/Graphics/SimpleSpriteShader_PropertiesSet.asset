@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   propertiesRawData:
   - propertyName: _mainTexSTBuffer
-    updateMode: 2
+    updateMode: 0
   - propertyName: _sortingIndexBuffer
     updateMode: 0
   - propertyName: _positionBuffer

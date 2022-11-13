@@ -9,25 +9,21 @@ namespace NSprites
     {
         static readonly Dictionary<Texture, Material> _overridedMaterials = new();
 
-        public bool ExcludeUnityTransformComponents = true;
-        [SerializeField]
-        private Sprite _sprite;
-        [SerializeField]
-        private SpriteRenderData _spriteRenderData;
-        public int SortingIndex;
-        public bool IncludeInSortingGroup;
-        public float2 scale = new(1f);
-        [SerializeField]
-        private bool _overrideSpriteTexture;
-        [SerializeField]
-        private float2 _pivot = new(.5f);
+        [SerializeField] public bool ExcludeUnityTransformComponents = true;
+        [SerializeField] private Sprite _sprite;
+        [SerializeField] private SpriteRenderData _spriteRenderData;
+        [SerializeField] public float2 scale = new(1f);
+        [SerializeField] private bool _overrideSpriteTexture;
+        [SerializeField] private float2 _pivot = new(.5f);
+
+        public float2 VisualSize => new float2(_sprite.bounds.size.x, _sprite.bounds.size.y) * scale;
 
         public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
         {
             dstManager.AddSpriteRenderComponents(entity);
             _ = dstManager.AddComponentData(entity, new SpriteSortingIndex());
             _ = dstManager.AddComponentData(entity, new Pivot { value = _pivot });
-            _ = dstManager.AddComponentData(entity, new Scale2D { value = new float2(_sprite.bounds.size.x, _sprite.bounds.size.y) * scale });
+            _ = dstManager.AddComponentData(entity, new Scale2D { value = VisualSize });
             var data = _spriteRenderData;
             if (_overrideSpriteTexture)
                 data.Material = GetOrCreateOverridedMaterial(_sprite.texture);

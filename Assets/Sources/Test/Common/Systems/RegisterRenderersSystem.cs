@@ -5,7 +5,7 @@ using Unity.Entities;
 namespace NSprites
 {
     [WorldSystemFilter(WorldSystemFilterFlags.Editor | WorldSystemFilterFlags.Default)]
-    public partial class RegistrateRenderersSystem : SystemBase
+    public partial class RegisterRenderersSystem : SystemBase
     {
         private SpriteRenderingSystem _spriteRenderingSystem;
         private EntityQuery _renderArchetypeToRegistrateQuery;
@@ -57,11 +57,11 @@ namespace NSprites
 
                     if (!_registeredIDsSet.Contains(renderData.data.ID))
                     {
-                        _spriteRenderingSystem.RegistrateRender
+                        _spriteRenderingSystem.RegisterRender
                         (
                             renderData.data.ID,
                             renderData.data.Material,
-                            renderData.data.PropertiesSet.PropertyData
+                            propertyDataSet: renderData.data.PropertiesSet.PropertyData
                         );
                         _ = _registeredIDsSet.Add(renderData.data.ID);
                     }

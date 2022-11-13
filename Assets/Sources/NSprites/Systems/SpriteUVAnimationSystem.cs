@@ -4,7 +4,8 @@ using Unity.Entities;
 
 public partial class SpriteUVAnimationSystem : SystemBase
 {
-    private const float frameDuration = 0.25f;
+    public const float frameDuration = 0.25f;
+
     protected override void OnUpdate()
     {
         var deltaTime = Time.DeltaTime;
