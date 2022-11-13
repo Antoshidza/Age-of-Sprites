@@ -46,6 +46,7 @@ SpriteAtlas:
     packables:
     - {fileID: 102900000, guid: 90ac1e8bf4cf37c44afdc6bc4af088ee, type: 3}
     - {fileID: 102900000, guid: 70ff25e17e05df2479a09da83af3616c, type: 3}
+    - {fileID: 102900000, guid: a3781f6e434e42c4488e84b58fb2014e, type: 3}
     bindAsDefault: 1
     isAtlasV2: 0
     cachedData: {fileID: 0}
@@ -55,12 +56,14 @@ SpriteAtlas:
   - {fileID: 21300000, guid: 24a114725c2819a4bae34b3068cb953a, type: 3}
   - {fileID: 21300000, guid: 0aa1ef593c907dd47bc810d5acb570fa, type: 3}
   - {fileID: 21300000, guid: 1c35a3e98a880314fa98f7438c3a72f6, type: 3}
+  - {fileID: 21300000, guid: c3a33f1d69974a64fbfb5c30407cf7f2, type: 3}
   - {fileID: 21300000, guid: ac7bfc7f58d4ce94b888b838aaf32e0e, type: 3}
   m_PackedSpriteNamesToIndex:
   - Elf_attack_hair
   - human_default_walk_body
   - human_default_walk_hair
   - Elf_attack_outfit
+  - legion_walk
   - Elf_attack_body
   m_RenderDataMap: {}
   m_Tag: HumanAtlas

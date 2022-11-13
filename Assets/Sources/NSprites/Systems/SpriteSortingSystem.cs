@@ -126,7 +126,9 @@ namespace NSprites
 
                 ComponentType.ReadOnly<WorldPosition2D>(),
 
-                ComponentType.ReadOnly<SpriteSortingIndex>()
+                ComponentType.ReadOnly<SpriteSortingIndex>(),
+
+                ComponentType.Exclude<CullSpriteTag>()
             );
         }
         public void OnDestroy(ref SystemState state)
