@@ -1,11 +1,10 @@
-using System;
+﻿using System;
 using Unity.Entities;
 using Unity.Mathematics;
 
+[Serializable]
 public struct SquadSettings : IComponentData, IEquatable<SquadSettings>
 {
-    public Entity soldierPrefab;
-    public float2 soldierSize;
     public float2 soldierMargin;
     public int2 squadResolution;
 

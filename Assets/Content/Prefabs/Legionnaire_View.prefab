@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 6556419895431801022}
   - component: {fileID: 6556419895431801023}
   - component: {fileID: 6556419895431801009}
-  - component: {fileID: 7378672684838329269}
   - component: {fileID: 822614791854575104}
   - component: {fileID: 1589399780938169317}
   - component: {fileID: 2745815831997589868}
@@ -19,6 +18,7 @@ GameObject:
   - component: {fileID: 2339574026035196605}
   - component: {fileID: 3557293695414743417}
   - component: {fileID: 325793087537828558}
+  - component: {fileID: 1326121019756511899}
   m_Layer: 0
   m_Name: Legionnaire_View
   m_TagString: Untagged
@@ -67,19 +67,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   color: {r: 1, g: 1, b: 1, a: 1}
---- !u!114 &7378672684838329269
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6556419895431801010}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 32c19d48b6571c247b6e9c8471a7b437, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _sprite: {fileID: 21300000, guid: c3a33f1d69974a64fbfb5c30407cf7f2, type: 3}
 --- !u!114 &822614791854575104
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -186,3 +173,15 @@ MonoBehaviour:
   value:
     x: 0
     y: 0
+--- !u!114 &1326121019756511899
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6556419895431801010}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4435ea85a931de4cb3407970fbc2ac4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

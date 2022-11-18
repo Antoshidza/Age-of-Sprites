@@ -14,6 +14,8 @@ public partial struct MoveToDestinationSystem : ISystem
     [BurstCompile]
     private struct CalculateMoveTimerJob : IJobChunk
     {
+        private const float threshold = .01f;
+
         [ReadOnly] public EntityTypeHandle entityTypeHandle;
         public ComponentTypeHandle<MoveTimer> moveTimer_CTH_RW;
         [ReadOnly] public ComponentTypeHandle<MoveSpeed> moveSpeed_CTH_RO;
@@ -38,12 +40,19 @@ public partial struct MoveToDestinationSystem : ISystem
                         timers[entityIndex] = new MoveTimer { remainingTime = GetRamainingTime(worldPositions[entityIndex].value, destionations[entityIndex].value, moveSpeeds[entityIndex].value) };
                 else
                     for (int entityIndex = 0; entityIndex < worldPositions.Length; entityIndex++)
-                        ecb.AddComponent(firstEntityIndex + entityIndex, entities[entityIndex], new MoveTimer { remainingTime = GetRamainingTime(worldPositions[entityIndex].value, destionations[entityIndex].value, moveSpeeds[entityIndex].value) });
+                    {
+                        var distance = math.length(destionations[entityIndex].value - worldPositions[entityIndex].value);
+                        if(distance > threshold)
+                            ecb.AddComponent(firstEntityIndex + entityIndex, entities[entityIndex], new MoveTimer { remainingTime = GetRamainingTime(distance, moveSpeeds[entityIndex].value) });
+                    }
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static float GetRamainingTime(in float2 pos, in float2 dest, float speed)
-            => math.length(dest - pos) / speed;
+            => GetRamainingTime(math.length(dest - pos), speed);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static float GetRamainingTime(in float distance, float speed)
+            => distance / speed;
     }
     #endregion
 

@@ -24,6 +24,8 @@ namespace NSprites
             _ = dstManager.AddComponentData(entity, new SpriteSortingIndex());
             _ = dstManager.AddComponentData(entity, new Pivot { value = _pivot });
             _ = dstManager.AddComponentData(entity, new Scale2D { value = VisualSize });
+            _ = dstManager.AddComponentData(entity, new MainTexST { value = NSpritesUtils.GetTextureST(_sprite) });
+            _ = dstManager.AddComponentData(entity, new MainTexSTInitial { value = NSpritesUtils.GetTextureST(_sprite) });
             var data = _spriteRenderData;
             if (_overrideSpriteTexture)
                 data.Material = GetOrCreateOverridedMaterial(_sprite.texture);

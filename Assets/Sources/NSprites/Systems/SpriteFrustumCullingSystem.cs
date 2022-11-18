@@ -1,6 +1,7 @@
 ﻿using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
+using UnityEditor;
 using UnityEngine;
 
 namespace NSprites
@@ -10,6 +11,23 @@ namespace NSprites
         private Camera _camera;
         private EntityCommandBufferSystem _ecbSystem;
 
+#if UNITY_EDITOR
+        [MenuItem("NSprites/Toggle frustum culling system")]
+        public static void ToggleFrustumCullingSystem()
+        {
+            var sys = World.DefaultGameObjectInjectionWorld.GetExistingSystem<SpriteFrustumCullingSystem>();
+            if (sys == null)
+                return;
+
+            sys.Enabled = !sys.Enabled;
+
+            if (!sys.Enabled)
+            {
+                sys.GetEntityQuery(typeof(CullSpriteTag));
+                sys.EntityManager.RemoveComponent(sys.GetEntityQuery(typeof(CullSpriteTag)), ComponentType.ReadOnly<CullSpriteTag>());
+            }
+        }
+#endif
         protected override void OnCreate()
         {
             base.OnCreate();
@@ -40,7 +58,7 @@ namespace NSprites
                 .ForEach((Entity entity, int entityInQueryIndex, in WorldPosition2D worldPosition, in Scale2D size, in Pivot pivot) =>
                 {
                     var viewPosition = worldPosition.value - size.value * pivot.value;
-                    if(IsInsideCameraBounds(GetRect(worldPosition.value, size.value), cameraViewBounds))
+                    if(IsInsideCameraBounds(GetRect(viewPosition, size.value), cameraViewBounds))
                         ecbEnableRendering.RemoveComponent<CullSpriteTag>(entityInQueryIndex, entity);
                 }).ScheduleParallel(Dependency);
 

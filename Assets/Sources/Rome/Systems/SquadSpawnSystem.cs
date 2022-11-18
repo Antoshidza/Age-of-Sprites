@@ -18,7 +18,8 @@ public partial struct SquadSpawnSystem : ISystem
         (
             ComponentType.ReadOnly<WorldPosition2D>(),
             ComponentType.ReadOnly<PrevWorldPosition2D>(),
-            ComponentType.ReadOnly<SoldierLink>()
+            ComponentType.ReadOnly<SoldierLink>(),
+            ComponentType.ReadOnly<RequireSoldier>()
         );
     }
 
@@ -32,24 +33,26 @@ public partial struct SquadSpawnSystem : ISystem
             return;
         
         var ecb = _ecbSystem.CreateCommandBuffer();
-        var squadSettings = state.GetSingleton<SquadSettings>();
-        var soldierCount = squadSettings.squadResolution.x * squadSettings.squadResolution.y;
+        var squadSettings = state.GetSingleton<SquadDefaultSettings>();
+        var soldierCount = squadSettings.SoldierCount;
 
-        var soldiersEntities = new NativeArray<Entity>(soldierCount, Allocator.Temp);
-        ecb.Instantiate(squadSettings.soldierPrefab, soldiersEntities);
+        //var soldiersEntities = new NativeArray<Entity>(soldierCount, Allocator.Temp);
+        //ecb.Instantiate(squadSettings.soldierPrefab, soldiersEntities);
         var squadEntity = ecb.CreateEntity(_squadArchetype);
-        var soldiersBuffer = ecb.SetBuffer<SoldierLink>(squadEntity);
-        soldiersBuffer.Length = soldierCount;
-        var perSoldierOffset = (2 * squadSettings.soldierMargin + 1f) * squadSettings.soldierSize;
+        ecb.SetComponent(squadEntity, new RequireSoldier { count = soldierCount });
 
-        for (int soldierIndex = 0; soldierIndex < soldierCount; soldierIndex++)
-        {
-            var soldierEntity = soldiersEntities[soldierIndex];
-            soldiersBuffer[soldierIndex] = new SoldierLink { entity = soldierEntity };
-            ecb.SetComponent(soldierEntity, new Destination { value = perSoldierOffset * new int2(soldierIndex % squadSettings.squadResolution.x, soldierIndex / squadSettings.squadResolution.x) });
-            //ecb.SetComponent(soldierEntity, new AnimationTimer { value = UnityEngine.Random.Range(0f, SpriteUVAnimationSystem.frameDuration) });
-            ecb.SetComponent(soldierEntity, new MoveSpeed { value = UnityEngine.Random.Range(1f, 2f) });
-        }
+        //var soldiersBuffer = ecb.SetBuffer<SoldierLink>(squadEntity);
+        //soldiersBuffer.Length = soldierCount;
+
+        //var perSoldierOffset = (2 * squadSettings.soldierMargin + 1f) * squadSettings.soldierSize;
+        //for (int soldierIndex = 0; soldierIndex < soldierCount; soldierIndex++)
+        //{
+        //    var soldierEntity = soldiersEntities[soldierIndex];
+        //    soldiersBuffer[soldierIndex] = new SoldierLink { entity = soldierEntity };
+        //    ecb.SetComponent(soldierEntity, new Destination { value = perSoldierOffset * new int2(soldierIndex % squadSettings.squadResolution.x, soldierIndex / squadSettings.squadResolution.x) });
+        //    //ecb.SetComponent(soldierEntity, new AnimationTimer { value = UnityEngine.Random.Range(0f, SpriteUVAnimationSystem.frameDuration) });
+        //    ecb.SetComponent(soldierEntity, new MoveSpeed { value = UnityEngine.Random.Range(1f, 2f) });
+        //}
 
         _ecbSystem.AddJobHandleForProducer(state.Dependency);
     }
