@@ -3,6 +3,7 @@ using Unity.Mathematics;
 
 namespace NSprites
 {
+    [DisableAutoCreation]
     public partial class RandomColorSystem : SystemBase
     {
         private Random _random;

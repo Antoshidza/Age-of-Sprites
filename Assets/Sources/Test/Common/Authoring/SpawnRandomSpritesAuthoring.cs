@@ -1,16 +1,17 @@
 using UnityEngine;
 using System.Collections.Generic;
 using Unity.Collections;
-using Unity.Mathematics;
 using Unity.Entities;
-using Random = Unity.Mathematics.Random;
-using NSprites;
+using Unity.Mathematics;
 
 public class SpawnRandomSpritesAuthoring : MonoBehaviour, IConvertGameObjectToEntity, IDeclareReferencedPrefabs
 {
-    [SerializeField] private int _spawnCount = 1;
+    [SerializeField] private int _totalCount = 1;
+    [SerializeField] private int _startSpawnCount = 1;
+    [SerializeField] private int _spawnAcceleration = 1;
     [SerializeField] private GameObject[] _prefabs;
-    [SerializeField] private float2x2 _spawnBounds = new(-100f, -100f, 100f, 100f);
+    [SerializeField] private float2x2 _spawnBounds;
+    [SerializeField] private float _timerBeforeSpawn;
 
     public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
     {
@@ -21,13 +22,18 @@ public class SpawnRandomSpritesAuthoring : MonoBehaviour, IConvertGameObjectToEn
         for (int prefabIndex = 0; prefabIndex < _prefabs.Length; prefabIndex++)
             prefabEntities[prefabIndex] = conversionSystem.GetPrimaryEntity(_prefabs[prefabIndex]);
 
-        var rand = new Random((uint)System.DateTime.Now.Ticks);
-        for (int i = 0; i < _spawnCount; i++)
+        var prefabBuffer = dstManager.AddBuffer<PrefabLink>(entity);
+        prefabBuffer.AddRange(prefabEntities.Reinterpret<PrefabLink>());
+
+        _ = dstManager.AddComponentData(entity, new SpawnerData
         {
-            var newEntity = dstManager.Instantiate(prefabEntities[rand.NextInt(0, prefabEntities.Length)]);
-            dstManager.SetComponentData(newEntity, new WorldPosition2D { value = rand.NextFloat2(_spawnBounds.c0, _spawnBounds.c1) });
-            dstManager.AddComponentData(newEntity, new RandomColor());
-        }
+            totalCount = _totalCount,
+            countPerSpawn = _startSpawnCount,
+            spawnAcceleration = _spawnAcceleration,
+            spawnBounds = _spawnBounds
+        });
+
+        _ = dstManager.AddComponentData(entity, new FactoryTimer { value = _timerBeforeSpawn });
     }
     public void DeclareReferencedPrefabs(List<GameObject> referencedPrefabs)
     {
