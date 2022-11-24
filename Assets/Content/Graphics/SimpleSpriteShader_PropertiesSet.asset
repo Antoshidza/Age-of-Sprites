@@ -15,7 +15,7 @@ MonoBehaviour:
   propertiesRawData:
   - propertyName: _mainTexSTBuffer
     updateMode: 0
-  - propertyName: _sortingIndexBuffer
+  - propertyName: _sortingValueBuffer
     updateMode: 0
   - propertyName: _positionBuffer
     updateMode: 0

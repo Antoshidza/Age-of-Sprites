@@ -15,13 +15,25 @@ namespace NSprites
         [SerializeField] public float2 scale = new(1f);
         [SerializeField] private bool _overrideSpriteTexture;
         [SerializeField] private float2 _pivot = new(.5f);
+        [Space]
+        [SerializeField] private bool _enableSorting;
+        [SerializeField] private int _sortingIndex;
+        [SerializeField] private int _sortingLayer;
 
         public float2 VisualSize => new float2(_sprite.bounds.size.x, _sprite.bounds.size.y) * scale;
 
         public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
         {
             dstManager.AddSpriteRenderComponents(entity);
-            _ = dstManager.AddComponentData(entity, new SpriteSortingIndex());
+
+            if (_enableSorting)
+            {
+                _ = dstManager.AddComponentData(entity, new VisualSortingTag());
+                _ = dstManager.AddComponentData(entity, new SortingIndex { value = _sortingIndex });
+                _ = dstManager.AddSharedComponentData(entity, new SortingLayer { index = _sortingLayer });
+            }
+            _ = dstManager.AddComponentData(entity, new SortingValue());
+
             _ = dstManager.AddComponentData(entity, new Pivot { value = _pivot });
             _ = dstManager.AddComponentData(entity, new Scale2D { value = VisualSize });
             _ = dstManager.AddComponentData(entity, new MainTexST { value = NSpritesUtils.GetTextureST(_sprite) });

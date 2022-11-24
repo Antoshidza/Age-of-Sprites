@@ -3,14 +3,12 @@
     Properties
     {
         _MainTex("_MainTex", 2D) = "white" {}
-        _ExtraST("_ExtraST", Vector) = (1,1,0,0)
     }
 
     HLSLINCLUDE
     #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
     CBUFFER_START(UnityPerMaterial)
-        float4 _ExtraST;
     CBUFFER_END
     ENDHLSL
 
@@ -55,7 +53,7 @@
 #if defined(UNITY_INSTANCING_ENABLED) || defined(UNITY_PROCEDURAL_INSTANCING_ENABLED) || defined(UNITY_STEREO_INSTANCING_ENABLED)
             StructuredBuffer<int> _propertyPointers;
             StructuredBuffer<float4> _mainTexSTBuffer;
-            StructuredBuffer<int> _sortingIndexBuffer;
+            StructuredBuffer<float> _sortingValueBuffer;
             StructuredBuffer<float2> _positionBuffer;
             StructuredBuffer<float2> _pivotBuffer;
             StructuredBuffer<float2> _heightWidthBuffer;
@@ -89,18 +87,18 @@
 #if defined(UNITY_INSTANCING_ENABLED) || defined(UNITY_PROCEDURAL_INSTANCING_ENABLED) || defined(UNITY_STEREO_INSTANCING_ENABLED)
                 int propertyIndex = _propertyPointers[instanceID];
                 float4 mainTexST = _mainTexSTBuffer[propertyIndex];
-                int sortingIndex = _sortingIndexBuffer[propertyIndex];
+                float sortingValue = _sortingValueBuffer[propertyIndex];
 #else
                 float4 mainTexST = float4(1, 1, 0, 0);
-                int sortingIndex = 0;
+                float sortingValue = 0;
 #endif
 
                 UNITY_SETUP_INSTANCE_ID(attributes);
                 UNITY_TRANSFER_INSTANCE_ID(attributes, varyings);
 
                 varyings.positionCS = TransformObjectToHClip(attributes.positionOS);
-                varyings.positionCS.z = 1.0 / (sortingIndex + 1); //+1 to prevent 0 sorting index
-                varyings.uv = TilingAndOffset(TilingAndOffset(attributes.uv, mainTexST.xy, mainTexST.zw), _ExtraST.xy, _ExtraST.zw);
+                varyings.positionCS.z = sortingValue; //+1 to prevent 0 sorting index
+                varyings.uv = TilingAndOffset(attributes.uv, mainTexST.xy, mainTexST.zw);
 
                 return varyings;
             }
