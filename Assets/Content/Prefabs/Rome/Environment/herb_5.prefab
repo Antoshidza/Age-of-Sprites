@@ -84,3 +84,4 @@ MonoBehaviour:
   _pivot:
     x: 0.5
     y: 0
+  _sortingIndex: 0

@@ -166,6 +166,9 @@ MonoBehaviour:
   _pivot:
     x: 0.5
     y: 0
+  _enableSorting: 1
+  _sortingIndex: 0
+  _sortingLayer: 0
 --- !u!114 &162107601
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -501,6 +504,9 @@ MonoBehaviour:
   _pivot:
     x: 0.5
     y: 0
+  _enableSorting: 1
+  _sortingIndex: 0
+  _sortingLayer: 0
 --- !u!114 &1086384501
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -666,6 +672,9 @@ MonoBehaviour:
   _pivot:
     x: 0.5
     y: 0
+  _enableSorting: 1
+  _sortingIndex: 0
+  _sortingLayer: 0
 --- !u!114 &1402945158
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -771,6 +780,9 @@ MonoBehaviour:
   _pivot:
     x: 0.5
     y: 0
+  _enableSorting: 1
+  _sortingIndex: 0
+  _sortingLayer: 0
 --- !u!114 &1464671404
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -970,6 +982,9 @@ MonoBehaviour:
   _pivot:
     x: 0.5
     y: 0
+  _enableSorting: 1
+  _sortingIndex: 0
+  _sortingLayer: 0
 --- !u!114 &1820903440
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1039,6 +1054,9 @@ MonoBehaviour:
   _pivot:
     x: 0.5
     y: 0
+  _enableSorting: 1
+  _sortingIndex: 0
+  _sortingLayer: 0
 --- !u!114 &1876798923
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1138,6 +1156,9 @@ MonoBehaviour:
   _pivot:
     x: 0.5
     y: 0
+  _enableSorting: 1
+  _sortingIndex: 0
+  _sortingLayer: 0
 --- !u!114 &1884073909
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1222,6 +1243,9 @@ MonoBehaviour:
   _pivot:
     x: 0.5
     y: 0
+  _enableSorting: 1
+  _sortingIndex: 0
+  _sortingLayer: 0
 --- !u!114 &2060239503
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1272,6 +1296,9 @@ MonoBehaviour:
   _pivot:
     x: 0.5
     y: 0
+  _enableSorting: 1
+  _sortingIndex: 0
+  _sortingLayer: 0
 --- !u!114 &7503012752993437376
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1293,7 +1320,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7503012752993437389}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.576, y: -0.098, z: 0}
+  m_LocalPosition: {x: -0.615, y: -0.035, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

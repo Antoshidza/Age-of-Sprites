@@ -44,8 +44,6 @@ SpriteAtlas:
     secondaryTextureSettings: {}
     variantMultiplier: 1
     packables:
-    - {fileID: 102900000, guid: 90ac1e8bf4cf37c44afdc6bc4af088ee, type: 3}
-    - {fileID: 102900000, guid: 70ff25e17e05df2479a09da83af3616c, type: 3}
     - {fileID: 102900000, guid: a3781f6e434e42c4488e84b58fb2014e, type: 3}
     bindAsDefault: 1
     isAtlasV2: 0
@@ -53,15 +51,11 @@ SpriteAtlas:
   m_MasterAtlas: {fileID: 0}
   m_PackedSprites:
   - {fileID: 21300000, guid: bc58578122bf84f4d96288b2a8c9319d, type: 3}
-  - {fileID: 21300000, guid: 060e0cf1e796be540ba26475d0a30360, type: 3}
-  - {fileID: 21300000, guid: 24a114725c2819a4bae34b3068cb953a, type: 3}
   - {fileID: 21300000, guid: d6d58353f362083438113e4912f86e6e, type: 3}
   - {fileID: 21300000, guid: 513967a3d7745e647ac5bebd10fa1d08, type: 3}
   - {fileID: 21300000, guid: 632a8ab31bd1542429030aaa1629ede5, type: 3}
   - {fileID: 21300000, guid: 53d826882f5c16847ad4e1391b5422de, type: 3}
   - {fileID: 21300000, guid: 874659e8319636943ae47c5b664ded73, type: 3}
-  - {fileID: 21300000, guid: 0aa1ef593c907dd47bc810d5acb570fa, type: 3}
-  - {fileID: 21300000, guid: 1c35a3e98a880314fa98f7438c3a72f6, type: 3}
   - {fileID: 1285215280, guid: e0da980a8ad9fe5489e70b1a6db18f97, type: 3}
   - {fileID: 1671162207, guid: e0da980a8ad9fe5489e70b1a6db18f97, type: 3}
   - {fileID: 374889812, guid: e0da980a8ad9fe5489e70b1a6db18f97, type: 3}
@@ -80,18 +74,13 @@ SpriteAtlas:
   - {fileID: 21300000, guid: 170bfe9c419b498439091b9ae5857c22, type: 3}
   - {fileID: 21300000, guid: 4b1cb70dd1b358447af0946df579ac49, type: 3}
   - {fileID: 21300000, guid: c3a33f1d69974a64fbfb5c30407cf7f2, type: 3}
-  - {fileID: 21300000, guid: ac7bfc7f58d4ce94b888b838aaf32e0e, type: 3}
   m_PackedSpriteNamesToIndex:
   - centurion_walk
-  - Elf_attack_hair
-  - human_default_walk_body
   - flag
   - rock_2
   - rock_1
   - rock_5
   - centurion_stop
-  - human_default_walk_hair
-  - Elf_attack_outfit
   - GreenGrassTiles_14
   - GreenGrassTiles_13
   - GreenGrassTiles_12
@@ -110,7 +99,6 @@ SpriteAtlas:
   - tent
   - rock_4
   - legion_walk
-  - Elf_attack_body
   m_RenderDataMap: {}
   m_Tag: HumanAtlas
   m_IsVariant: 0

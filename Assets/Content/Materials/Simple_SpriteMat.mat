@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: SpriteMat
+  m_Name: Simple_SpriteMat
   m_Shader: {fileID: 4800000, guid: dd53b49ac24771749867b3d0c0293964, type: 3}
   m_ValidKeywords:
   - PROCEDURAL_INSTANCING_ON
