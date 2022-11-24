@@ -3,5 +3,5 @@
 [GenerateAuthoringComponent]
 public struct AnimationTimer : IComponentData
 {
-    public float value;
+    public double value;
 }
