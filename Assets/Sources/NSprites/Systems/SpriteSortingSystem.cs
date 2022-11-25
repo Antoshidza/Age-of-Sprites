@@ -117,6 +117,7 @@ namespace NSprites
         private const int LayerCount = 8;
         private const float PerLayerOffset = 1f / LayerCount;
         private EntityQuery _sortingSpritesQuery;
+        private EntityQuery _sortingStaticSpritesQuery;
         private List<SortingLayer> _sortingLayers;
 
         protected override void OnCreate()
@@ -133,79 +134,112 @@ namespace NSprites
                 ComponentType.ReadOnly<SortingLayer>(),
                 ComponentType.ReadOnly<VisualSortingTag>()
             );
+            _sortingStaticSpritesQuery = GetEntityQuery
+            (
+                ComponentType.Exclude<CullSpriteTag>(),
+
+                ComponentType.ReadOnly<WorldPosition2D>(),
+
+                ComponentType.ReadOnly<SortingValue>(),
+                ComponentType.ReadOnly<SortingIndex>(),
+                ComponentType.ReadOnly<SortingLayer>(),
+                ComponentType.ReadOnly<VisualSortingTag>(),
+                ComponentType.ReadOnly<SortingStaticTag>()
+            );
             _sortingLayers = new List<SortingLayer>();
         }
 
         protected override void OnUpdate()
         {
+            var sortingSpritesIsEmpty = _sortingSpritesQuery.IsEmpty;
+            _sortingStaticSpritesQuery.AddOrderVersionFilter();
+            var sortingStaticSpritesIsEmpty = _sortingStaticSpritesQuery.IsEmpty;
+
+            if (sortingSpritesIsEmpty && sortingStaticSpritesIsEmpty)
+                return;
+
             _sortingLayers.Clear();
             EntityManager.GetAllUniqueSharedComponentData(_sortingLayers);
-            var handles = new NativeArray<JobHandle>(_sortingLayers.Count, Allocator.Temp);
+            var handles = new NativeArray<JobHandle>(_sortingLayers.Count * 2, Allocator.Temp);
 
-            for (int i = 0; i < _sortingLayers.Count; i++)
+            if (!sortingSpritesIsEmpty)
             {
-                var sortingLayer = _sortingLayers[i];
-                _sortingSpritesQuery.SetSharedComponentFilter(sortingLayer);
-
-                var spriteEntitiesCount = _sortingSpritesQuery.CalculateEntityCount();
-
-                if (spriteEntitiesCount == 0)
-                    continue;
-
-                var sortingDataArray = new NativeArray<SortingData>(spriteEntitiesCount, Allocator.TempJob);
-                // will use it to optimize sorting
-                var dataPointers = new NativeArray<int>(spriteEntitiesCount, Allocator.TempJob);
-                // will use it to write back result values
-                var sortingValues = new NativeArray<SortingValue>(spriteEntitiesCount, Allocator.TempJob);
-
-                var gatherSortingDataJob = new GatherSortingDataJob
+                for (int i = 0; i < _sortingLayers.Count; i++)
                 {
-                    entityTypeHandle = GetEntityTypeHandle(),
-                    worldPosition2D_CTH = GetComponentTypeHandle<WorldPosition2D>(true),
-                    worldPosition2D_CDFE = GetComponentDataFromEntity<WorldPosition2D>(true),
-                    sortingIndex_CTH = GetComponentTypeHandle<SortingIndex>(true),
-                    pointers = dataPointers,
-                    sortingDataArray = sortingDataArray
-                };
-                var gatherSortingDataHandle = gatherSortingDataJob.ScheduleParallelByRef(_sortingSpritesQuery, Dependency);
+                    var sortingLayer = _sortingLayers[i];
+                    _sortingSpritesQuery.SetSharedComponentFilter(sortingLayer);
+                    handles[i] = RegularSort(_sortingSpritesQuery, sortingLayer.index);
+                }
+            }
 
-                // TODO: optimize sorting by splitting screen on N squares, where N is number of threads
-
-                // after sorting dataPointers get sorted while sortingDataArray stay the same
-                var sortHandle = new SortArrayJob<int, SortingDataComparer>
+            if (!sortingStaticSpritesIsEmpty)
+            {
+                for (int i = 0; i < _sortingLayers.Count; i++)
                 {
-                    array = dataPointers,
-                    comparer = new()
-                    {
-                        sourceData = sortingDataArray,
-                        sourceDataComparer = new()
-                    }
-                }.Schedule(gatherSortingDataHandle);
-
-                _ = sortingDataArray.Dispose(sortHandle);
-
-                var genSortingValuesJob= new GenerateSortingValuesJob
-                {
-                    layerIndex = sortingLayer.index,
-                    sortingValues = sortingValues,
-                    pointers = dataPointers,
-                }.ScheduleBatch(sortingValues.Length, 32, sortHandle);
-
-                _ = dataPointers.Dispose(genSortingValuesJob);
-
-                var writeBackChunkDataJob = new WriteSortingValuesToChunksJob
-                {
-                    sortingValues = sortingValues,
-                    sortingValue_CTH_WO = GetComponentTypeHandle<SortingValue>(false)
-                };
-                var writeBackChunkDataHandle = writeBackChunkDataJob.ScheduleParallelByRef(_sortingSpritesQuery, genSortingValuesJob);
-
-                _ = sortingValues.Dispose(writeBackChunkDataHandle);
-
-                handles[i] = writeBackChunkDataHandle;
+                    var sortingLayer = _sortingLayers[i];
+                    _sortingStaticSpritesQuery.SetSharedComponentFilter(sortingLayer);
+                    handles[i * 2] = RegularSort(_sortingStaticSpritesQuery, sortingLayer.index);
+                }
             }
 
             Dependency = JobHandle.CombineDependencies(handles);
+        }
+        private JobHandle RegularSort(in EntityQuery sortingQuery, int sortingLayer)
+        {
+            var spriteEntitiesCount = sortingQuery.CalculateEntityCount();
+
+            if (spriteEntitiesCount == 0)
+                return default;
+
+            var sortingDataArray = new NativeArray<SortingData>(spriteEntitiesCount, Allocator.TempJob);
+            // will use it to optimize sorting
+            var dataPointers = new NativeArray<int>(spriteEntitiesCount, Allocator.TempJob);
+            // will use it to write back result values
+            var sortingValues = new NativeArray<SortingValue>(spriteEntitiesCount, Allocator.TempJob);
+
+            var gatherSortingDataJob = new GatherSortingDataJob
+            {
+                entityTypeHandle = GetEntityTypeHandle(),
+                worldPosition2D_CTH = GetComponentTypeHandle<WorldPosition2D>(true),
+                worldPosition2D_CDFE = GetComponentDataFromEntity<WorldPosition2D>(true),
+                sortingIndex_CTH = GetComponentTypeHandle<SortingIndex>(true),
+                pointers = dataPointers,
+                sortingDataArray = sortingDataArray
+            };
+            var gatherSortingDataHandle = gatherSortingDataJob.ScheduleParallelByRef(sortingQuery, Dependency);
+
+            // after sorting dataPointers get sorted while sortingDataArray stay the same
+            var sortHandle = new SortArrayJob<int, SortingDataComparer>
+            {
+                array = dataPointers,
+                comparer = new()
+                {
+                    sourceData = sortingDataArray,
+                    sourceDataComparer = new()
+                }
+            }.Schedule(gatherSortingDataHandle);
+
+            _ = sortingDataArray.Dispose(sortHandle);
+
+            var genSortingValuesJob = new GenerateSortingValuesJob
+            {
+                layerIndex = sortingLayer,
+                sortingValues = sortingValues,
+                pointers = dataPointers,
+            }.ScheduleBatch(sortingValues.Length, 32, sortHandle);
+
+            _ = dataPointers.Dispose(genSortingValuesJob);
+
+            var writeBackChunkDataJob = new WriteSortingValuesToChunksJob
+            {
+                sortingValues = sortingValues,
+                sortingValue_CTH_WO = GetComponentTypeHandle<SortingValue>(false)
+            };
+            var writeBackChunkDataHandle = writeBackChunkDataJob.ScheduleParallelByRef(sortingQuery, genSortingValuesJob);
+
+            _ = sortingValues.Dispose(writeBackChunkDataHandle);
+
+            return writeBackChunkDataHandle;
         }
     }
 }
