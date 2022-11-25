@@ -89,9 +89,10 @@ MonoBehaviour:
   _pivot:
     x: 0.5
     y: 0
-  _enableSorting: 1
+  _disableSorting: 0
+  _staticSorting: 0
   _sortingIndex: 0
-  _sortingLayer: 0
+  _sortingLayer: 1
 --- !u!114 &2339574026035196605
 MonoBehaviour:
   m_ObjectHideFlags: 0
