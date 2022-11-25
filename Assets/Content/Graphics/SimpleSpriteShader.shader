@@ -97,7 +97,7 @@
                 UNITY_TRANSFER_INSTANCE_ID(attributes, varyings);
 
                 varyings.positionCS = TransformObjectToHClip(attributes.positionOS);
-                varyings.positionCS.z = sortingValue; //+1 to prevent 0 sorting index
+                varyings.positionCS.z = sortingValue;
                 varyings.uv = TilingAndOffset(attributes.uv, mainTexST.xy, mainTexST.zw);
 
                 return varyings;

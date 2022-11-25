@@ -160,7 +160,6 @@ namespace NSprites
         protected override void OnUpdate()
         {
             var sortingSpritesIsEmpty = _sortingSpritesQuery.IsEmpty;
-            //_sortingStaticSpritesQuery.SetOrderVersionFilter();
             var sortingStaticSpritesIsEmpty = _sortingStaticOrderChangedSpritesQuery.IsEmpty;
 
             if (sortingSpritesIsEmpty && sortingStaticSpritesIsEmpty)
