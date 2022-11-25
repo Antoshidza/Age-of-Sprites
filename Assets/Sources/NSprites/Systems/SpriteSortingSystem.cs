@@ -160,7 +160,9 @@ namespace NSprites
 
             _sortingLayers.Clear();
             EntityManager.GetAllUniqueSharedComponentData(_sortingLayers);
-            var handles = new NativeArray<JobHandle>(_sortingLayers.Count * 2, Allocator.Temp);
+            var bothModes = !sortingSpritesIsEmpty & !sortingSpritesIsEmpty;
+            var handles = new NativeArray<JobHandle>(_sortingLayers.Count * (bothModes ? 2 : 1), Allocator.Temp);
+            var staticHandlesOffset = bothModes ? _sortingLayers.Count : 0;
 
             if (!sortingSpritesIsEmpty)
             {
@@ -178,7 +180,7 @@ namespace NSprites
                 {
                     var sortingLayer = _sortingLayers[i];
                     _sortingStaticSpritesQuery.SetSharedComponentFilter(sortingLayer);
-                    handles[i * 2] = RegularSort(_sortingStaticSpritesQuery, sortingLayer.index);
+                    handles[staticHandlesOffset + i] = RegularSort(_sortingStaticSpritesQuery, sortingLayer.index);
                 }
             }
 
