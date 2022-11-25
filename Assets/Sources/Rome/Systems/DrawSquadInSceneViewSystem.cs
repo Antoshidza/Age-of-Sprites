@@ -5,12 +5,28 @@ using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEditor;
 using UnityEngine;
-using static UnityEditor.PlayerSettings;
 
 [WorldSystemFilter(WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor)]
+[UpdateInGroup(typeof(PresentationSystemGroup))]
+[UpdateAfter(typeof(SpriteRenderingSystem))]
 public struct DrawSquadInSceneViewSystem : ISystem
 {
+    private struct EnableSquadDrawing : IComponentData { }
+
     private EntityQuery _squadQuery;
+
+#if UNITY_EDITOR
+    [MenuItem("NSprites/Toggle draw squads for View window")]
+    public static void ToggleFrustumCullingSystem()
+    {
+        var entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+        var enableSquadDrawingQuery = entityManager.CreateEntityQuery(typeof(EnableSquadDrawing));
+        if (enableSquadDrawingQuery.IsEmpty)
+            _ = entityManager.AddComponentData(entityManager.CreateEntity(), new EnableSquadDrawing());
+        else
+            entityManager.DestroyEntity(enableSquadDrawingQuery);
+    }
+#endif
 
     public void OnCreate(ref SystemState state)
     {
@@ -19,6 +35,7 @@ public struct DrawSquadInSceneViewSystem : ISystem
             typeof(SquadSettings),
             typeof(WorldPosition2D)
         );
+        state.RequireSingletonForUpdate<EnableSquadDrawing>();
     }
 
     public void OnDestroy(ref SystemState state)
