@@ -16,7 +16,9 @@ namespace NSprites
         [SerializeField] private bool _overrideSpriteTexture;
         [SerializeField] private float2 _pivot = new(.5f);
         [Space]
-        [SerializeField] private bool _enableSorting;
+        [SerializeField] private bool _disableSorting;
+        [Tooltip("Use it when entities exists on the same layer and never changes theirs position / sorting index / layer")]
+        [SerializeField] private bool _staticSorting;
         [SerializeField] private int _sortingIndex;
         [SerializeField] private int _sortingLayer;
 
@@ -26,11 +28,14 @@ namespace NSprites
         {
             dstManager.AddSpriteRenderComponents(entity);
 
-            if (_enableSorting)
+            if (!_disableSorting)
             {
                 _ = dstManager.AddComponentData(entity, new VisualSortingTag());
                 _ = dstManager.AddComponentData(entity, new SortingIndex { value = _sortingIndex });
                 _ = dstManager.AddSharedComponentData(entity, new SortingLayer { index = _sortingLayer });
+
+                if(_staticSorting)
+                    _ = dstManager.AddComponentData(entity, new SortingStaticTag());
             }
             _ = dstManager.AddComponentData(entity, new SortingValue());
 
