@@ -17,7 +17,7 @@ public partial struct SpriteUVAnimationSystem : ISystem
         var time = state.Time.ElapsedTime;
 
         state.Dependency = state.Entities
-            //.WithNone<CullSpriteTag>()
+            .WithNone<CullSpriteTag>()
             .ForEach((ref AnimationTimer animationTimer,
                                 ref FrameIndex frameIndex,
                                 ref MainTexST mainTexST,
