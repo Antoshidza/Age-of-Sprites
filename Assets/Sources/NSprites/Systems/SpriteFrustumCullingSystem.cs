@@ -22,10 +22,7 @@ namespace NSprites
             sys.Enabled = !sys.Enabled;
 
             if (!sys.Enabled)
-            {
-                sys.GetEntityQuery(typeof(CullSpriteTag));
                 sys.EntityManager.RemoveComponent(sys.GetEntityQuery(typeof(CullSpriteTag)), ComponentType.ReadOnly<CullSpriteTag>());
-            }
         }
 #endif
         protected override void OnCreate()
