@@ -1,4 +1,5 @@
-﻿using NSprites;
+﻿#if UNITY_EDITOR
+using NSprites;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -9,7 +10,7 @@ using UnityEngine;
 [WorldSystemFilter(WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor)]
 [UpdateInGroup(typeof(PresentationSystemGroup))]
 [UpdateAfter(typeof(SpriteRenderingSystem))]
-public struct DrawSquadInSceneViewSystem : ISystem
+public partial struct DrawSquadInSceneViewSystem : ISystem
 {
     private struct EnableSquadDrawing : IComponentData { }
 
@@ -77,3 +78,4 @@ public struct DrawSquadInSceneViewSystem : ISystem
         positions.Dispose();
     }
 }
+#endif

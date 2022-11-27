@@ -8,6 +8,7 @@ using Unity.Mathematics;
 
 namespace NSprites
 {
+    // TODO: try to get rid of managed things in 1.0 entities and make system burstable ISystem
     [WorldSystemFilter(WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor)]
     public partial class SpriteSortingSystem : SystemBase
     {

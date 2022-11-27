@@ -20,7 +20,7 @@ public partial struct SpawnRandomPrefabsSystem : ISystem
         var deltaTime = state.Time.DeltaTime;
         var time = state.Time.ElapsedTime;
         var scale2D_CDFE = state.GetComponentDataFromEntity<Scale2D>(true);
-        var animDataLink_CDFE = state.GetComponentDataFromEntity<AnimationDataLink>(true);
+        var animDataLink_CDFE = state.GetComponentDataFromEntity<AnimationSetLink>(true);
 
         state.Dependency = state.Entities
             .WithReadOnly(scale2D_CDFE)
@@ -39,7 +39,7 @@ public partial struct SpawnRandomPrefabsSystem : ISystem
                     var entityPrefab = prefabs[rand.NextInt(0, prefabs.Length)].link;
                     var newEntity = ecb.Instantiate(entityPrefab);
                     ecb.SetComponent(newEntity, new WorldPosition2D { value = rand.NextFloat2(data.spawnBounds.c0, data.spawnBounds.c1) });
-                    ref var animData = ref animDataLink_CDFE[entityPrefab].value.Value;
+                    ref var animData = ref animDataLink_CDFE[entityPrefab].value.Value[0]; // peek 1st animation here
                     var frameIndex = rand.NextInt(0, animData.FrameDurations.Length);
                     ecb.SetComponent(newEntity, new AnimationTimer { value = time + animData.FrameDurations[frameIndex] });
                     ecb.SetComponent(newEntity, new FrameIndex { value = frameIndex });

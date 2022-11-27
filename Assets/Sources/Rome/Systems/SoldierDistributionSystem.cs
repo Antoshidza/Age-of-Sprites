@@ -4,7 +4,8 @@ using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
 
-public struct SoldierDistributionSystem : ISystem
+[BurstCompile]
+public partial struct SoldierDistributionSystem : ISystem
 {
     private EntityQuery _soldierLessSquadQuery;
     private EntityQuery _freeSoldiersQuery;

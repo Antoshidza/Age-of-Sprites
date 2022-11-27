@@ -1,7 +1,9 @@
-﻿using Unity.Entities;
+﻿using Unity.Burst;
+using Unity.Entities;
 using UnityEngine;
 
-public struct SpawnSoliderSystem : ISystem
+[BurstCompile]
+public partial struct SpawnSoliderSystem : ISystem
 {
     private EntityCommandBufferSystem _ecbSystem;
 

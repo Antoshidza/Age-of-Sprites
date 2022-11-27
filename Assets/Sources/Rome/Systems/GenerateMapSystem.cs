@@ -7,7 +7,7 @@ using Unity.Jobs;
 using Unity.Jobs.LowLevel.Unsafe;
 using Unity.Mathematics;
 
-public struct GenerateMapSystem : ISystem
+public partial struct GenerateMapSystem : ISystem
 {
     [BurstCompile]
     private struct GenerateMapJob : IJobParallelForBatch
