@@ -2,6 +2,10 @@
 using Unity.Mathematics;
 using Unity.Entities;
 
+/// Compare <see cref="AnimationTimer"/> with global time and switch <see cref="FrameIndex"/> when timer expired.
+/// Perform only not-culled entities. Restore <see cref="FrameIndex"/> and duration time for entities which be culled for some time.
+/// 
+/// Somehow calculations goes a bit wrong and unculled entities gets synchronyzed, don't know how to fix
 public partial struct SpriteUVAnimationSystem : ISystem
 {
     public void OnCreate(ref SystemState state)
@@ -21,13 +25,14 @@ public partial struct SpriteUVAnimationSystem : ISystem
             .ForEach((ref AnimationTimer animationTimer,
                                 ref FrameIndex frameIndex,
                                 ref MainTexST mainTexST,
-                                in AnimationDataLink animation) =>
+                                in AnimationSetLink animationSet,
+                                in AnimationIndex animationIndex) =>
             {
                 var timerDelta = time - animationTimer.value;
 
                 if (timerDelta >= 0f)
                 {
-                    ref var animData = ref animation.value.Value;
+                    ref var animData = ref animationSet.value.Value[animationIndex.value];
                     var frameCount = animData.GridSize.x * animData.GridSize.y;
                     frameIndex.value = (frameIndex.value + 1) % frameCount;
                     var nextFrameDuration = animData.FrameDurations[frameIndex.value];
@@ -45,8 +50,6 @@ public partial struct SpriteUVAnimationSystem : ISystem
                             nextFrameDuration = animData.FrameDurations[frameIndex.value];
                         }
                         nextFrameDuration -= extraTime;
-
-                        //Debug.Log($"{timerDelta} > {animData.AnimationDuration}. extraTime: {(float)(timerDelta % animData.AnimationDuration)}. index: {prevIndex} -> {frameIndex.value}, fd: {prevFrameDuration} -> {nextFrameDuration}");
                     }
 
                     animationTimer.value = time + nextFrameDuration;

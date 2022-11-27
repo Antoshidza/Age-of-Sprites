@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59540757d4006d444aaf5d4f510bc912, type: 3}
+  m_Name: Legionnaire_AnimationSet
+  m_EditorClassIdentifier: 
+  _animations:
+  - name: idle
+    data: {fileID: 11400000, guid: e4eb27f6ecb5c234bb5bd74249c0b5ea, type: 2}
+  - name: walk
+    data: {fileID: 11400000, guid: e8a7e880ded79954fa2d69bf3a1dab5e, type: 2}

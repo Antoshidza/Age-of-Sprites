@@ -74,6 +74,7 @@ SpriteAtlas:
   - {fileID: 21300000, guid: 170bfe9c419b498439091b9ae5857c22, type: 3}
   - {fileID: 21300000, guid: 4b1cb70dd1b358447af0946df579ac49, type: 3}
   - {fileID: 21300000, guid: c3a33f1d69974a64fbfb5c30407cf7f2, type: 3}
+  - {fileID: 21300000, guid: 898aac7e69fb2e94a96989699ad9f692, type: 3}
   m_PackedSpriteNamesToIndex:
   - centurion_walk
   - flag
@@ -99,6 +100,7 @@ SpriteAtlas:
   - tent
   - rock_4
   - legion_walk
+  - legion_idle
   m_RenderDataMap: {}
   m_Tag: HumanAtlas
   m_IsVariant: 0
