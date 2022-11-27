@@ -11,7 +11,7 @@ namespace NSprites
         [SerializeField] private int _initialAnimationIndex;
         private static BlobAssetStore _blobAssetStore;
 
-        private static BlobAssetStore BlobAssetStore => _blobAssetStore ??= new BlobAssetStore();
+        private static BlobAssetStore BlobAssetStore => _blobAssetStore ??= new();
 
         public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
         {
@@ -69,12 +69,5 @@ namespace NSprites
             var framePosition = new int2(0 % initialAnim.GridSize.x, 0 / initialAnim.GridSize.x);
             _ = dstManager.AddComponentData(entity, new MainTexST { value = new float4(frameSize, initialAnim.MainTexSTOnAtlas.zw + frameSize * framePosition) });
         }
-
-        private static void Dispose()
-        {
-            if (_blobAssetStore != null)
-                _blobAssetStore?.Dispose();
-        }
-        static SpriteAnimationAuthoring() => Application.quitting -= () => Dispose();
     }
 }
