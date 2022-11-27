@@ -118,7 +118,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f86e5e7d7de75e9438e45c4c12003efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  value: 1
+  value: 0.75
 --- !u!114 &325793087537828558
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -158,4 +158,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be769d94253e895418ce7434194ba34e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _animationData: {fileID: 11400000, guid: e8a7e880ded79954fa2d69bf3a1dab5e, type: 2}
+  _animationSet: {fileID: 11400000, guid: 7e08c69b054bf874eb7a3a0792460244, type: 2}
+  _initialAnimationIndex: 0

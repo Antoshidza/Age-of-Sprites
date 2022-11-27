@@ -87,7 +87,7 @@ MonoBehaviour:
   _disableSorting: 0
   _staticSorting: 0
   _sortingIndex: 0
-  _sortingLayer: 0
+  _sortingLayer: 1
 --- !u!1 &3552026049697118962
 GameObject:
   m_ObjectHideFlags: 0
@@ -175,7 +175,7 @@ MonoBehaviour:
   _disableSorting: 0
   _staticSorting: 0
   _sortingIndex: 0
-  _sortingLayer: 0
+  _sortingLayer: 1
 --- !u!1 &6443343230394864119
 GameObject:
   m_ObjectHideFlags: 0
