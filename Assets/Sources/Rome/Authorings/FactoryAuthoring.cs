@@ -9,6 +9,7 @@ public class FactoryAuthoring : MonoBehaviour, IConvertGameObjectToEntity, IDecl
     [SerializeField] private float2 _spawnOffset;
     [SerializeField] private float _duration = 1f;
     [SerializeField] private int _spawnCount = 1;
+    [SerializeField] private bool _randomInitialDuration;
 
     public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
     {
@@ -19,7 +20,7 @@ public class FactoryAuthoring : MonoBehaviour, IConvertGameObjectToEntity, IDecl
             count = _spawnCount,
             duration = _duration
         });
-        _ = dstManager.AddComponentData(entity, new FactoryTimer { value = _duration });
+        _ = dstManager.AddComponentData(entity, new FactoryTimer { value = _randomInitialDuration ? UnityEngine.Random.Range(0f, _duration) : _duration });
     }
 
     public void DeclareReferencedPrefabs(List<GameObject> referencedPrefabs)

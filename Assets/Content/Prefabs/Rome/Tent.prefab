@@ -285,3 +285,4 @@ MonoBehaviour:
     y: 0
   _duration: 0.35
   _spawnCount: 1
+  _randomInitialDuration: 1
