@@ -12,6 +12,11 @@
 * Implementing 2D transforms to avoid unecessary data
 * +Poor example of producing units and building squads for strategy games
 
+## Requirements
+* Unity 2021.3.x
+* Entities v0.51.1-preview.21 package
+* [NSprites v1.0.3](https://github.com/Antoshidza/NSprites/releases/tag/v1.0.3)
+
 ## How register render
 For this project I've used adding managed component to sprite entity to be able to register unique renders at runtime. Such solution doesn't scale well with growing count of existing sprites in scene. Though there are few possibilities to solve problem of managed components such as using components with fixed string GUID and then load managed data with AssetDatabase.
 
