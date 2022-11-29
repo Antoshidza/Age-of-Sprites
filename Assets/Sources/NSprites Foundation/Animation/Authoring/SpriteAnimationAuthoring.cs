@@ -9,9 +9,6 @@ namespace NSprites
     {
         [SerializeField] private SpriteAnimationSet _animationSet;
         [SerializeField] private int _initialAnimationIndex;
-        private static BlobAssetStore _blobAssetStore;
-
-        private static BlobAssetStore BlobAssetStore => _blobAssetStore ??= new();
 
         public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
         {
@@ -53,7 +50,7 @@ namespace NSprites
             }
 
             var blobAssetReference = blobBuilder.CreateBlobAssetReference<BlobArray<SpriteAnimationBlobData>>(Allocator.Persistent);
-            _ = BlobAssetStore.AddUniqueBlobAsset(ref blobAssetReference);
+            _ = conversionSystem.BlobAssetStore.AddUniqueBlobAsset(ref blobAssetReference);
             blobBuilder.Dispose();
             #endregion
 
