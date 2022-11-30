@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace NSprites
 {
-    [CreateAssetMenu(fileName = "NewNSpriteAnimationSet", menuName = "Nsprites/Animation Set")]
+    [CreateAssetMenu(fileName = "NewNSpriteAnimationSet", menuName = "NSprites/Animation Set")]
     public class SpriteAnimationSet : ScriptableObject
     {
         [Serializable]

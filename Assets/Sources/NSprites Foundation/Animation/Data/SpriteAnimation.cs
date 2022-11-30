@@ -1,7 +1,7 @@
 ﻿using Unity.Mathematics;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "NewNSpriteAnimation", menuName = "Nsprites/Animation (frame sequence)")]
+[CreateAssetMenu(fileName = "NewNSpriteAnimation", menuName = "NSprites/Animation (frame sequence)")]
 public class SpriteAnimation : ScriptableObject
 {
     public Sprite SpriteSheet;

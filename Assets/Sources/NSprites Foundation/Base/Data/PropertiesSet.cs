@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace NSprites
 {
-    [CreateAssetMenu(fileName = "PropertiesSet", menuName = "Shader Properties Set", order = 1)]
+    [CreateAssetMenu(fileName = "PropertiesSet", menuName = "NSprites/Shader Properties Set", order = 1)]
     public class PropertiesSet : ScriptableObject
     {
         /// <summary>Holds info about: what shader's property name / update mode property uses</summary>
