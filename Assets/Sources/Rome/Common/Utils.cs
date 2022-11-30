@@ -6,6 +6,7 @@ using UnityEngine;
 
 public static class Utils
 {
+#if UNITY_EDITOR
     public enum DrawType
     {
         Gizmo,
@@ -62,6 +63,7 @@ public static class Utils
         else if (drawType == DrawType.Debug)
             Debug.DrawLine(a, b, color);
     }
+#endif
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float3 ToFloat3(this in float2 value, in float z = 0f)
     {

@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using Unity.Entities;
 using Unity.Mathematics;
-using UnityEditor;
 using UnityEngine;
 
 public class MapAuthoring : MonoBehaviour, IConvertGameObjectToEntity, IDeclareReferencedPrefabs
@@ -36,9 +35,10 @@ public class MapAuthoring : MonoBehaviour, IConvertGameObjectToEntity, IDeclareR
     {
         referencedPrefabs.AddRange(_rockPrefabs);
     }
-
+#if UNITY_EDITOR
     private void OnDrawGizmosSelected()
     {
         Utils.DrawRect(_rect, _gizmoColor);
     }
+#endif
 }
