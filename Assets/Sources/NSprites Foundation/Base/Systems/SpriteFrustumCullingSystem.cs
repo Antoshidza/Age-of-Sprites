@@ -33,6 +33,9 @@ namespace NSprites
         }
         protected override void OnUpdate()
         {
+            if(_camera == null)
+                _camera = Camera.main;
+
             var leftBottomPoint = _camera.ScreenToWorldPoint(new Vector3(0f,0f,0f));
             var rightUpPoint = _camera.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, 0f));
             var cameraViewBounds = new float4(leftBottomPoint.x, rightUpPoint.x, leftBottomPoint.y, rightUpPoint.y);
