@@ -1,0 +1,132 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &4343727234628468602
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: RomeAtlas
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 1
+      compressionQuality: 50
+      maxTextureSize: 2048
+      textureCompression: 0
+      filterMode: 0
+      generateMipMaps: 0
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings:
+    - serializedVersion: 3
+      m_BuildTarget: DefaultTexturePlatform
+      m_MaxTextureSize: 2048
+      m_ResizeAlgorithm: 0
+      m_TextureFormat: -1
+      m_TextureCompression: 0
+      m_CompressionQuality: 50
+      m_CrunchedCompression: 0
+      m_AllowsAlphaSplitting: 0
+      m_Overridden: 0
+      m_AndroidETC2FallbackOverride: 0
+      m_ForceMaximumCompressionQuality_BC6H_BC7: 0
+    packingSettings:
+      serializedVersion: 2
+      padding: 2
+      blockOffset: 1
+      allowAlphaSplitting: 0
+      enableRotation: 0
+      enableTightPacking: 0
+      enableAlphaDilation: 0
+    secondaryTextureSettings: {}
+    variantMultiplier: 1
+    packables:
+    - {fileID: 102900000, guid: a3781f6e434e42c4488e84b58fb2014e, type: 3}
+    bindAsDefault: 1
+    isAtlasV2: 0
+    cachedData: {fileID: 0}
+    packedSpriteRenderDataKeys:
+    - bc58578122bf84f4d96288b2a8c9319d: 21300000
+    - d6d58353f362083438113e4912f86e6e: 21300000
+    - 513967a3d7745e647ac5bebd10fa1d08: 21300000
+    - 632a8ab31bd1542429030aaa1629ede5: 21300000
+    - 53d826882f5c16847ad4e1391b5422de: 21300000
+    - 874659e8319636943ae47c5b664ded73: 21300000
+    - e0da980a8ad9fe5489e70b1a6db18f97: 1285215280
+    - e0da980a8ad9fe5489e70b1a6db18f97: 1671162207
+    - e0da980a8ad9fe5489e70b1a6db18f97: 374889812
+    - e0da980a8ad9fe5489e70b1a6db18f97: -1854379560
+    - e0da980a8ad9fe5489e70b1a6db18f97: 981405118
+    - e0da980a8ad9fe5489e70b1a6db18f97: -1797626312
+    - e0da980a8ad9fe5489e70b1a6db18f97: -1284998397
+    - e0da980a8ad9fe5489e70b1a6db18f97: 649409042
+    - e0da980a8ad9fe5489e70b1a6db18f97: 1150618941
+    - e0da980a8ad9fe5489e70b1a6db18f97: -652142395
+    - e0da980a8ad9fe5489e70b1a6db18f97: -1118087211
+    - e0da980a8ad9fe5489e70b1a6db18f97: 75218537
+    - e0da980a8ad9fe5489e70b1a6db18f97: -1150303984
+    - e0da980a8ad9fe5489e70b1a6db18f97: -513920271
+    - c3d92d4c7303a964985e9836d9e9f41e: 21300000
+    - 170bfe9c419b498439091b9ae5857c22: 21300000
+    - 4b1cb70dd1b358447af0946df579ac49: 21300000
+    - c3a33f1d69974a64fbfb5c30407cf7f2: 21300000
+    - 898aac7e69fb2e94a96989699ad9f692: 21300000
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300000, guid: bc58578122bf84f4d96288b2a8c9319d, type: 3}
+  - {fileID: 21300000, guid: d6d58353f362083438113e4912f86e6e, type: 3}
+  - {fileID: 21300000, guid: 513967a3d7745e647ac5bebd10fa1d08, type: 3}
+  - {fileID: 21300000, guid: 632a8ab31bd1542429030aaa1629ede5, type: 3}
+  - {fileID: 21300000, guid: 53d826882f5c16847ad4e1391b5422de, type: 3}
+  - {fileID: 21300000, guid: 874659e8319636943ae47c5b664ded73, type: 3}
+  - {fileID: 1285215280, guid: e0da980a8ad9fe5489e70b1a6db18f97, type: 3}
+  - {fileID: 1671162207, guid: e0da980a8ad9fe5489e70b1a6db18f97, type: 3}
+  - {fileID: 374889812, guid: e0da980a8ad9fe5489e70b1a6db18f97, type: 3}
+  - {fileID: -1854379560, guid: e0da980a8ad9fe5489e70b1a6db18f97, type: 3}
+  - {fileID: 981405118, guid: e0da980a8ad9fe5489e70b1a6db18f97, type: 3}
+  - {fileID: -1797626312, guid: e0da980a8ad9fe5489e70b1a6db18f97, type: 3}
+  - {fileID: -1284998397, guid: e0da980a8ad9fe5489e70b1a6db18f97, type: 3}
+  - {fileID: 649409042, guid: e0da980a8ad9fe5489e70b1a6db18f97, type: 3}
+  - {fileID: 1150618941, guid: e0da980a8ad9fe5489e70b1a6db18f97, type: 3}
+  - {fileID: -652142395, guid: e0da980a8ad9fe5489e70b1a6db18f97, type: 3}
+  - {fileID: -1118087211, guid: e0da980a8ad9fe5489e70b1a6db18f97, type: 3}
+  - {fileID: 75218537, guid: e0da980a8ad9fe5489e70b1a6db18f97, type: 3}
+  - {fileID: -1150303984, guid: e0da980a8ad9fe5489e70b1a6db18f97, type: 3}
+  - {fileID: -513920271, guid: e0da980a8ad9fe5489e70b1a6db18f97, type: 3}
+  - {fileID: 21300000, guid: c3d92d4c7303a964985e9836d9e9f41e, type: 3}
+  - {fileID: 21300000, guid: 170bfe9c419b498439091b9ae5857c22, type: 3}
+  - {fileID: 21300000, guid: 4b1cb70dd1b358447af0946df579ac49, type: 3}
+  - {fileID: 21300000, guid: c3a33f1d69974a64fbfb5c30407cf7f2, type: 3}
+  - {fileID: 21300000, guid: 898aac7e69fb2e94a96989699ad9f692, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - centurion_walk
+  - flag
+  - rock_2
+  - rock_1
+  - rock_5
+  - centurion_stop
+  - GreenGrassTiles_14
+  - GreenGrassTiles_13
+  - GreenGrassTiles_12
+  - GreenGrassTiles_11
+  - GreenGrassTiles_10
+  - GreenGrassTiles_4
+  - GreenGrassTiles_5
+  - GreenGrassTiles_6
+  - GreenGrassTiles_7
+  - GreenGrassTiles_1
+  - GreenGrassTiles_2
+  - GreenGrassTiles_3
+  - GreenGrassTiles_8
+  - GreenGrassTiles_9
+  - rock_3
+  - tent
+  - rock_4
+  - legion_walk
+  - legion_idle
+  m_RenderDataMap: {}
+  m_Tag: HumanAtlas
+  m_IsVariant: 0
