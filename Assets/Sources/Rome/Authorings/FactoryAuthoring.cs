@@ -1,30 +1,31 @@
-﻿using System.Collections.Generic;
-using Unity.Entities;
+﻿using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Serialization;
 
-public class FactoryAuthoring : MonoBehaviour, IConvertGameObjectToEntity, IDeclareReferencedPrefabs
+public class FactoryAuthoring : MonoBehaviour
 {
-    [SerializeField] private GameObject _prefab;
-    [SerializeField] private float2 _spawnOffset;
-    [SerializeField] private float _duration = 1f;
-    [SerializeField] private int _spawnCount = 1;
-    [SerializeField] private bool _randomInitialDuration;
-
-    public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
+    private class FactoryBaker : Baker<FactoryAuthoring>
     {
-        _ = dstManager.AddComponentData(entity, new FactoryData 
+        public override void Bake(FactoryAuthoring authoring)
         {
-            prefab = conversionSystem.GetPrimaryEntity(_prefab),
-            instantiatePos = new float2(transform.position.x, transform.position.y) + _spawnOffset,
-            count = _spawnCount,
-            duration = _duration
-        });
-        _ = dstManager.AddComponentData(entity, new FactoryTimer { value = _randomInitialDuration ? UnityEngine.Random.Range(0f, _duration) : _duration });
+            AddComponent
+            (
+                new FactoryData
+                {
+                    prefab = GetEntity(authoring.Prefab),
+                    instantiatePos = new float2(authoring.transform.position.x, authoring.transform.position.y) + authoring.SpawnOffset,
+                    count = authoring.SpawnCount,
+                    duration = authoring.Duration
+                }
+            );
+            AddComponent(new FactoryTimer { value = authoring.RandomInitialDuration ? UnityEngine.Random.Range(0f, authoring.Duration) : authoring.Duration });
+        }
     }
 
-    public void DeclareReferencedPrefabs(List<GameObject> referencedPrefabs)
-    {
-        referencedPrefabs.Add(_prefab);
-    }
+    [FormerlySerializedAs("_prefab")] public GameObject Prefab;
+    [FormerlySerializedAs("_spawnOffset")] public float2 SpawnOffset;
+    [FormerlySerializedAs("_duration ")] public float Duration = 1f;
+    [FormerlySerializedAs("_spawnCount ")] public int SpawnCount = 1;
+    [FormerlySerializedAs("_randomInitialDuration")] public bool RandomInitialDuration;
 }
