@@ -57,7 +57,6 @@
             StructuredBuffer<float2> _positionBuffer;
             StructuredBuffer<float2> _pivotBuffer;
             StructuredBuffer<float2> _heightWidthBuffer;
-            StructuredBuffer<float4> _colorBuffer;
 #endif
 
             void setup()
@@ -107,14 +106,7 @@
             {
                 half4 texColor = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, varyings.uv);
                 clip(texColor.w - 0.5);
-
-#if defined(UNITY_INSTANCING_ENABLED) || defined(UNITY_PROCEDURAL_INSTANCING_ENABLED) || defined(UNITY_STEREO_INSTANCING_ENABLED)
-                int propertyIndex = _propertyPointers[instanceID];
-                float4 color = _colorBuffer[propertyIndex];
-                return texColor * color;
-#else
                 return texColor;
-#endif
             }
             ENDHLSL
         }
