@@ -9,8 +9,7 @@ namespace NSprites
     /// heierarchy you don't want to process complex logic in <seealso cref="Parent2DSystem"/>, because just simple deletion is enough,
     /// nothing to hande.
     /// </summary>
-    [GenerateAuthoringComponent]
-    public struct StaticRelationshipsTag : ISystemStateComponentData
+    public struct StaticRelationshipsTag : ICleanupComponentData
     {
     }
 }

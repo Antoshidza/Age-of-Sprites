@@ -23,5 +23,3 @@ MonoBehaviour:
     updateMode: 2
   - propertyName: _heightWidthBuffer
     updateMode: 2
-  - propertyName: _colorBuffer
-    updateMode: 0

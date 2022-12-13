@@ -32,11 +32,8 @@ public partial struct GenerateMapSystem : ISystem
         }
     }
 
-    private EntityCommandBufferSystem _ecbSystem;
-
     public void OnCreate(ref SystemState state)
     {
-        _ecbSystem = state.World.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
     }
 
     public void OnDestroy(ref SystemState state)
@@ -45,7 +42,7 @@ public partial struct GenerateMapSystem : ISystem
 
     public void OnUpdate(ref SystemState state)
     {
-        if (!state.TryGetSingleton<MapSettings>(out var mapSettings))
+        if (!SystemAPI.TryGetSingleton<MapSettings>(out var mapSettings))
             return;
 
         var rand = new Random((uint)System.DateTime.Now.Ticks);
@@ -55,13 +52,12 @@ public partial struct GenerateMapSystem : ISystem
 
         var generateMapJob = new GenerateMapJob
         {
-            ecb = _ecbSystem.CreateCommandBuffer().AsParallelWriter(),
+            ecb = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter(),
             mapSize = mapSettings.size,
             posRands = posRands,
             rocks = state.EntityManager.GetBuffer<PrefabLink>(mapSettings.rockCollectionLink).Reinterpret<Entity>().AsNativeArray()
         };
         state.Dependency = generateMapJob.ScheduleBatch(mapSettings.rockCount, 32, state.Dependency);
-        _ecbSystem.AddJobHandleForProducer(state.Dependency);
         _ = posRands.Dispose(state.Dependency);
 
         state.Enabled = false;

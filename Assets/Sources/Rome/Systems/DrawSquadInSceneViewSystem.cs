@@ -36,7 +36,7 @@ public partial struct DrawSquadInSceneViewSystem : ISystem
             typeof(SquadSettings),
             typeof(WorldPosition2D)
         );
-        state.RequireSingletonForUpdate<EnableSquadDrawing>();
+        state.RequireForUpdate<EnableSquadDrawing>();
     }
 
     public void OnDestroy(ref SystemState state)
@@ -45,11 +45,11 @@ public partial struct DrawSquadInSceneViewSystem : ISystem
 
     public void OnUpdate(ref SystemState state)
     {
-        if (!state.TryGetSingleton<SquadDefaultSettings>(out var squadGlobalSettings))
+        if (!SystemAPI.TryGetSingleton<SquadDefaultSettings>(out var squadGlobalSettings))
             return;
 
-        var settings = _squadQuery.ToComponentDataArrayAsync<SquadSettings>(Allocator.TempJob, out var settings_GatherHandle);
-        var positions = _squadQuery.ToComponentDataArrayAsync<WorldPosition2D>(Allocator.TempJob, out var poisitions_GatherHandle);
+        var settings = _squadQuery.ToComponentDataListAsync<SquadSettings>(Allocator.TempJob, out var settings_GatherHandle);
+        var positions = _squadQuery.ToComponentDataListAsync<WorldPosition2D>(Allocator.TempJob, out var poisitions_GatherHandle);
 
         JobHandle.CombineDependencies(settings_GatherHandle, poisitions_GatherHandle).Complete();
 
@@ -72,7 +72,6 @@ public partial struct DrawSquadInSceneViewSystem : ISystem
                 Utils.DrawRect(soldierRect, Color.green, 0f, Utils.DrawType.Debug);
             }
         }
-
 
         settings.Dispose();
         positions.Dispose();

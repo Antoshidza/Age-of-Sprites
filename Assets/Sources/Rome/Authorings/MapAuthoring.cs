@@ -1,44 +1,43 @@
-﻿using System.Collections.Generic;
-using Unity.Entities;
+﻿using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Serialization;
 
-public class MapAuthoring : MonoBehaviour, IConvertGameObjectToEntity, IDeclareReferencedPrefabs
+public class MapAuthoring : MonoBehaviour
 {
-    [SerializeField] private Color _gizmoColor = Color.green;
+    private class MapBaker : Baker<MapAuthoring>
+    {
+        public override void Bake(MapAuthoring authoring)
+        {
+            if (authoring.RockPrefabs == null)
+                return;
+
+            var rockCollectionEntity = CreateAdditionalEntity();
+            var rockBuffer = AddBuffer<PrefabLink>(rockCollectionEntity);
+            rockBuffer.Capacity = authoring.RockPrefabs.Length;
+            for (int i = 0; i < authoring.RockPrefabs.Length; i++)
+                _ = rockBuffer.Add(new PrefabLink { link = GetEntity(authoring.RockPrefabs[i]) });
+
+            AddComponent(new MapSettings
+            {
+                rockCollectionLink = rockCollectionEntity,
+                rockCount = authoring.RockCount,
+                size = authoring.Rect
+            });
+        }
+    }
+
+    [FormerlySerializedAs("_gizmoColor ")] public Color GizmoColor = Color.green;
     [Space]
 
-    [SerializeField] private float2x2 _rect;
-    [SerializeField] private int _rockCount;
-    [SerializeField] private GameObject[] _rockPrefabs;
+    [FormerlySerializedAs("_rect")] public float2x2 Rect;
+    [FormerlySerializedAs("_rockCount")] public int RockCount;
+    [FormerlySerializedAs("_rockPrefabs")] public GameObject[] RockPrefabs;
 
-    public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
-    {
-        if (_rockPrefabs == null)
-            return;
-
-        var rockCollectionEntity = conversionSystem.CreateAdditionalEntity(this);
-        var rockBuffer = dstManager.AddBuffer<PrefabLink>(rockCollectionEntity);
-        rockBuffer.Capacity = _rockPrefabs.Length;
-        for (int i = 0; i < _rockPrefabs.Length; i++)
-            _ = rockBuffer.Add(new PrefabLink { link = conversionSystem.GetPrimaryEntity(_rockPrefabs[i]) });
-
-        _ = dstManager.AddComponentData(entity, new MapSettings
-        {
-            rockCollectionLink = rockCollectionEntity,
-            rockCount = _rockCount,
-            size = _rect
-        });
-    }
-
-    public void DeclareReferencedPrefabs(List<GameObject> referencedPrefabs)
-    {
-        referencedPrefabs.AddRange(_rockPrefabs);
-    }
 #if UNITY_EDITOR
     private void OnDrawGizmosSelected()
     {
-        Utils.DrawRect(_rect, _gizmoColor);
+        Utils.DrawRect(Rect, GizmoColor);
     }
 #endif
 }

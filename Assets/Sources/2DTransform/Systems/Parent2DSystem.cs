@@ -2,6 +2,7 @@ using Unity.Entities;
 using Unity.Collections;
 using Unity.Burst;
 using Unity.Jobs;
+using Unity.Burst.Intrinsics;
 
 namespace NSprites
 {
@@ -18,7 +19,7 @@ namespace NSprites
         private EntityQuery _childBufferAlone;
 
         private ComponentType _lastParent2DComp = typeof(LastParent2D);
-        private ComponentTypes _componentsToRemoveFromUnparentedChildren = new ComponentTypes
+        private ComponentTypeSet _componentsToRemoveFromUnparentedChildren = new ComponentTypeSet
         (
             ComponentType.ReadOnly<Parent2D>(),
             ComponentType.ReadOnly<LastParent2D>(),
@@ -26,22 +27,22 @@ namespace NSprites
         );
 
         [BurstCompile]
-        private struct GatherReparentedChildrenDataJob : IJobEntityBatch
+        private struct GatherReparentedChildrenDataJob : IJobChunk
         {
-            public NativeParallelMultiHashMap<Entity, Entity>.ParallelWriter parentChildToAdd;
-            public NativeParallelMultiHashMap<Entity, Entity>.ParallelWriter parentChildToRemove;
+            public NativeMultiHashMap<Entity, Entity>.ParallelWriter parentChildToAdd;
+            public NativeMultiHashMap<Entity, Entity>.ParallelWriter parentChildToRemove;
             public NativeParallelHashSet<Entity>.ParallelWriter uniqueAffectedParents;
             [ReadOnly] public ComponentTypeHandle<Parent2D> parent_CTH;
             public ComponentTypeHandle<LastParent2D> lastParent_CTH;
             [ReadOnly] public EntityTypeHandle entityTypeHandle;
 
-            public void Execute(ArchetypeChunk batchInChunk, int batchIndex)
+            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
             {
-                var chunkParents = batchInChunk.GetNativeArray(parent_CTH);
-                var chunkLastParents = batchInChunk.GetNativeArray(lastParent_CTH);
-                var entities = batchInChunk.GetNativeArray(entityTypeHandle);
+                var chunkParents = chunk.GetNativeArray(/*ref*/ parent_CTH);
+                var chunkLastParents = chunk.GetNativeArray(/*ref*/ lastParent_CTH);
+                var entities = chunk.GetNativeArray(entityTypeHandle);
 
-                for (int entityIndex = 0; entityIndex < batchInChunk.Count; entityIndex++)
+                for (int entityIndex = 0; entityIndex < chunk.Count; entityIndex++)
                 {
                     var parentEntity = chunkParents[entityIndex].value;
                     var lastParentEntity = chunkLastParents[entityIndex].value;
@@ -65,19 +66,19 @@ namespace NSprites
             }
         }
         [BurstCompile]
-        private struct GatherMissingChildrenDataJob : IJobEntityBatch
+        private struct GatherMissingChildrenDataJob : IJobChunk
         {
             [ReadOnly] public ComponentTypeHandle<LastParent2D> lastParent_CTH;
             [ReadOnly] public EntityTypeHandle entityTypeHandle;
-            public NativeParallelMultiHashMap<Entity, Entity>.ParallelWriter parentChildToRemove;
+            public NativeMultiHashMap<Entity, Entity>.ParallelWriter parentChildToRemove;
             public NativeParallelHashSet<Entity>.ParallelWriter uniqueAffectedParents;
 
-            public void Execute(ArchetypeChunk batchInChunk, int batchIndex)
+            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
             {
-                var chunkEntities = batchInChunk.GetNativeArray(entityTypeHandle);
-                var chunkLastParents = batchInChunk.GetNativeArray(lastParent_CTH);
+                var chunkEntities = chunk.GetNativeArray(entityTypeHandle);
+                var chunkLastParents = chunk.GetNativeArray(/*ref*/ lastParent_CTH);
 
-                for (int entityIndex = 0; entityIndex < batchInChunk.Count; entityIndex++)
+                for (int entityIndex = 0; entityIndex < chunk.Count; entityIndex++)
                 {
                     var childEntity = chunkEntities[entityIndex];
                     var lastParent = chunkLastParents[entityIndex].value;
@@ -93,10 +94,10 @@ namespace NSprites
         private struct FixupRelationsJob : IJobParallelForBatch
         {
             [ReadOnly] public NativeArray<Entity> uniqueAffectedParents;
-            [ReadOnly] public NativeParallelMultiHashMap<Entity, Entity> parentChildToAdd;
-            [ReadOnly] public NativeParallelMultiHashMap<Entity, Entity> parentChildToRemove;
+            [ReadOnly] public NativeMultiHashMap<Entity, Entity> parentChildToAdd;
+            [ReadOnly] public NativeMultiHashMap<Entity, Entity> parentChildToRemove;
             public EntityCommandBuffer.ParallelWriter ecb;
-            [NativeDisableParallelForRestriction] public BufferFromEntity<Child2D> child_BFE;
+            [NativeDisableParallelForRestriction] public BufferLookup<Child2D> child_BL;
 
             public void Execute(int startIndex, int count)
             {
@@ -114,12 +115,12 @@ namespace NSprites
                     if (!parentHasNewChildren && !parentHasRemovedChildren)
                         return;
 
-                    var parentHasChildBuffer = child_BFE.HasComponent(parentEntity);
+                    var parentHasChildBuffer = child_BL.HasBuffer(parentEntity);
 
                     //if parent has removed children and existing child buffer then we want to clear it
                     if (parentHasRemovedChildren && parentHasChildBuffer)
                     {
-                        childBuffer = child_BFE[parentEntity];
+                        childBuffer = child_BL[parentEntity];
                         do
                             childList.Add(removeChildEntity);
                         while (parentChildToRemove.TryGetNextValue(out removeChildEntity, ref removeIterator));
@@ -147,7 +148,7 @@ namespace NSprites
                             childBuffer = ecb.AddBuffer<Child2D>(inJobIndex, parentEntity);
                         //if there is buffer and we not cache it in "Remove" section, then cache it here
                         else if (!parentHasRemovedChildren)
-                            childBuffer = child_BFE[parentEntity];
+                            childBuffer = child_BL[parentEntity];
 
                         do
                         {
@@ -177,20 +178,20 @@ namespace NSprites
             }
         }
         [BurstCompile]
-        private struct UnparentChildrenJob : IJobEntityBatch
+        private struct UnparentChildrenJob : IJobChunk
         {
             [ReadOnly] public EntityTypeHandle entityTypeHandle;
             [ReadOnly] public BufferTypeHandle<Child2D> child_BTH;
-            [ReadOnly] public ComponentDataFromEntity<Parent2D> parent_CDFE;
+            [ReadOnly] public ComponentLookup<Parent2D> parent_CL;
             public EntityCommandBuffer.ParallelWriter ecb;
-            public ComponentTypes componentsToRemoveFromChildren;
+            public ComponentTypeSet componentsToRemoveFromChildren;
 
-            public void Execute(ArchetypeChunk batchInChunk, int batchIndex)
+            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
             {
-                var chunkEntities = batchInChunk.GetNativeArray(entityTypeHandle);
-                var chunkChildren = batchInChunk.GetBufferAccessor(child_BTH);
+                var chunkEntities = chunk.GetNativeArray(entityTypeHandle);
+                var chunkChildren = chunk.GetBufferAccessor(/*ref */child_BTH);
 
-                for (int entityIndex = 0; entityIndex < batchInChunk.Count; entityIndex++)
+                for (int entityIndex = 0; entityIndex < chunk.Count; entityIndex++)
                 {
                     var parentEntity = chunkEntities[entityIndex];
                     var childBuffer = chunkChildren[entityIndex];
@@ -198,8 +199,8 @@ namespace NSprites
                     for (int childIndex = 0; childIndex < childBuffer.Length; childIndex++)
                     {
                         var childEntity = childBuffer[childIndex].value;
-                        if (!parent_CDFE.HasComponent(childEntity) || parent_CDFE[childEntity].value == parentEntity)
-                            ecb.RemoveComponent(batchIndex, childEntity, componentsToRemoveFromChildren);
+                        if (!parent_CL.HasComponent(childEntity) || parent_CL[childEntity].value == parentEntity)
+                            ecb.RemoveComponent(unfilteredChunkIndex, childEntity, componentsToRemoveFromChildren);
                     }
                 }
             }
@@ -268,7 +269,7 @@ namespace NSprites
                 {
                     entityTypeHandle = GetEntityTypeHandle(),
                     child_BTH = GetBufferTypeHandle<Child2D>(true),
-                    parent_CDFE = GetComponentDataFromEntity<Parent2D>(true),
+                    parent_CL = GetComponentLookup<Parent2D>(true),
                     ecb = unparentECB.AsParallelWriter(),
                     componentsToRemoveFromChildren = _componentsToRemoveFromUnparentedChildren
                 }.ScheduleParallel(_missingParents, Dependency);
@@ -295,8 +296,8 @@ namespace NSprites
                 }
                 //remove count is always bigger or equal to add count, so we can use it like max potential size. * 2 because there can be N parent + N last parent and all unique
                 var uniqueParents = new NativeParallelHashSet<Entity>(potentialRemoveCount * 2, Allocator.TempJob);
-                var parentChildToRemove = new NativeParallelMultiHashMap<Entity, Entity>(potentialRemoveCount, Allocator.TempJob);
-                var parentChildToAdd = new NativeParallelMultiHashMap<Entity, Entity>(potentialAddCount, Allocator.TempJob);
+                var parentChildToRemove = new NativeMultiHashMap<Entity, Entity>(potentialRemoveCount, Allocator.TempJob);
+                var parentChildToAdd = new NativeMultiHashMap<Entity, Entity>(potentialAddCount, Allocator.TempJob);
 
                 var uniqueParents_PW = uniqueParents.AsParallelWriter();
                 var parentChildToRemove_PW = parentChildToRemove.AsParallelWriter();
@@ -328,7 +329,7 @@ namespace NSprites
                     parentChildToAdd = parentChildToAdd,
                     parentChildToRemove = parentChildToRemove,
                     uniqueAffectedParents = uniqueParentArray,
-                    child_BFE = GetBufferFromEntity<Child2D>(false),
+                    child_BL = GetBufferLookup<Child2D>(false),
                     ecb = ecb.AsParallelWriter(),
                 }.ScheduleBatch(uniqueParentArray.Length, 32, default);
 

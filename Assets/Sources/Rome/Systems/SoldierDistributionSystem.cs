@@ -9,17 +9,16 @@ public partial struct SoldierDistributionSystem : ISystem
 {
     private EntityQuery _soldierLessSquadQuery;
     private EntityQuery _freeSoldiersQuery;
-    private EntityCommandBufferSystem _ecbSystem;
 
     [BurstCompile]
     private struct DistributeJob : IJob
     {
-        [ReadOnly] public NativeArray<Entity> squadEntities;
-        [ReadOnly] public NativeArray<RequireSoldier> requireSoldierData;
-        [ReadOnly] public NativeArray<Entity> soldierEntities;
+        [ReadOnly] public NativeList<Entity> squadEntities;
+        [ReadOnly] public NativeList<RequireSoldier> requireSoldierData;
+        [ReadOnly] public NativeList<Entity> soldierEntities;
         public EntityCommandBuffer ecb;
-        public BufferFromEntity<SoldierLink> soldierLink_BFE;
-        [WriteOnly] public ComponentDataFromEntity<RequireSoldier> requireSoldier_CDFE_WO;
+        public BufferLookup<SoldierLink> soldierLink_BFE;
+        [WriteOnly] public ComponentLookup<RequireSoldier> requireSoldier_CDFE_WO;
 
         public void Execute()
         {
@@ -70,7 +69,6 @@ public partial struct SoldierDistributionSystem : ISystem
             ComponentType.ReadOnly<SoldierTag>(),
             ComponentType.Exclude<InSquadSoldierTag>()
         );
-        _ecbSystem = state.World.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
     }
 
     public void OnDestroy(ref SystemState state)
@@ -79,17 +77,17 @@ public partial struct SoldierDistributionSystem : ISystem
 
     public void OnUpdate(ref SystemState state)
     {
-        var squadEntities = _soldierLessSquadQuery.ToEntityArrayAsync(Allocator.TempJob, out var squadEntities_GatherHandle);
-        var requireSoldierData = _soldierLessSquadQuery.ToComponentDataArrayAsync<RequireSoldier>(Allocator.TempJob, out var requireSoldier_GatherHandle);
-        var soldierEntities = _freeSoldiersQuery.ToEntityArrayAsync(Allocator.TempJob, out var soldierEntities_GatherHandle);
+        var squadEntities = _soldierLessSquadQuery.ToEntityListAsync(Allocator.TempJob, out var squadEntities_GatherHandle);
+        var requireSoldierData = _soldierLessSquadQuery.ToComponentDataListAsync<RequireSoldier>(Allocator.TempJob, state.Dependency, out var requireSoldier_GatherHandle);
+        var soldierEntities = _freeSoldiersQuery.ToEntityListAsync(Allocator.TempJob, out var soldierEntities_GatherHandle);
         var distributeJob = new DistributeJob
         {
             squadEntities = squadEntities,
             requireSoldierData = requireSoldierData,
             soldierEntities = soldierEntities,
-            ecb = _ecbSystem.CreateCommandBuffer(),
-            soldierLink_BFE = state.GetBufferFromEntity<SoldierLink>(false),
-            requireSoldier_CDFE_WO = state.GetComponentDataFromEntity<RequireSoldier>(false)
+            ecb = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged),
+            soldierLink_BFE = state.GetBufferLookup<SoldierLink>(false),
+            requireSoldier_CDFE_WO = state.GetComponentLookup<RequireSoldier>(false)
         };
 
         var inputHandles = new NativeArray<JobHandle>(4, Allocator.Temp);
@@ -98,8 +96,7 @@ public partial struct SoldierDistributionSystem : ISystem
         inputHandles[2] = soldierEntities_GatherHandle;
         inputHandles[3] = state.Dependency;
 
-        state.Dependency = distributeJob.Schedule(JobHandle.CombineDependencies(inputHandles));
-        _ecbSystem.AddJobHandleForProducer(state.Dependency);
+        state.Dependency = distributeJob.ScheduleByRef(JobHandle.CombineDependencies(inputHandles));
         _ = squadEntities.Dispose(state.Dependency);
         _ = requireSoldierData.Dispose(state.Dependency);
         _ = soldierEntities.Dispose(state.Dependency);

@@ -9,11 +9,29 @@ using Unity.Entities;
 [BurstCompile]
 public partial struct FactorySystem : ISystem
 {
-    private EntityCommandBufferSystem _ecbSystem;
+    [BurstCompile]
+    private partial struct ProductionJob : IJobEntity
+    {
+        public float deltaTime;
+        public EntityCommandBuffer.ParallelWriter ecb;
+
+        private void Execute([ChunkIndexInQuery] int chunkIndex, ref FactoryTimer timer, in FactoryData data)
+        {
+            timer.value -= deltaTime;
+
+            if (timer.value <= 0)
+            {
+                timer.value += data.duration;
+                var instanceEntities = new NativeArray<Entity>(data.count, Allocator.Temp);
+                ecb.Instantiate(chunkIndex, data.prefab, instanceEntities);
+                for (int i = 0; i < instanceEntities.Length; i++)
+                    ecb.SetComponent(chunkIndex, instanceEntities[i], new WorldPosition2D { value = data.instantiatePos });
+            }
+        }
+    }
 
     public void OnCreate(ref SystemState state)
     {
-        _ecbSystem = state.World.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
     }
 
     public void OnDestroy(ref SystemState state)
@@ -22,23 +40,11 @@ public partial struct FactorySystem : ISystem
 
     public void OnUpdate(ref SystemState state)
     {
-        var deltaTime = state.Time.DeltaTime;
-        var ecb = _ecbSystem.CreateCommandBuffer().AsParallelWriter();
-
-        state.Dependency = state.Entities.ForEach((int entityInQueryIndex, ref FactoryTimer timer, in FactoryData data) =>
+        var productionJob = new ProductionJob
         {
-            timer.value -= deltaTime;
-
-            if (timer.value <= 0)
-            {
-                timer.value += data.duration;
-                var instanceEntities = new NativeArray<Entity>(data.count, Allocator.Temp);
-                ecb.Instantiate(entityInQueryIndex, data.prefab, instanceEntities);
-                for (int i = 0; i < instanceEntities.Length; i++)
-                    ecb.SetComponent(entityInQueryIndex, instanceEntities[i], new WorldPosition2D { value = data.instantiatePos });
-            }
-        }).ScheduleParallel(state.Dependency);
-
-        _ecbSystem.AddJobHandleForProducer(state.Dependency);
+            deltaTime = SystemAPI.Time.DeltaTime,
+            ecb = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter()
+        };
+        state.Dependency = productionJob.ScheduleParallelByRef(state.Dependency);
     }
 }

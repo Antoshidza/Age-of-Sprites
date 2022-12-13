@@ -40,54 +40,18 @@ public partial class MovableAnimationControllSystem : SystemBase
     private EntityQuery _gotUnderWayQuery;
     private EntityQuery _stopedQuery;
 
-    //public void OnCreate(ref SystemState state)
-    //{
-    //    _gotUnderWayQuery = state.GetEntityQuery
-    //    (
-    //        ComponentType.ReadOnly<Destination>(),
-    //        ComponentType.ReadOnly<MoveTimer>()
-    //    );
-    //    _gotUnderWayQuery.AddOrderVersionFilter();
-    //    _stopedQuery = state.GetEntityQuery
-    //    (
-    //        ComponentType.ReadOnly<Destination>(),
-    //        ComponentType.Exclude<MoveTimer>()
-    //    );
-    //    _stopedQuery.AddOrderVersionFilter();
-    //}
-
-    //public void OnDestroy(ref SystemState state)
-    //{
-    //}
-
-    //public void OnUpdate(ref SystemState state)
-    //{
-    //    /// here we assume that all movable entities WITH <see cref="MoveTimer"/> are in moving state
-    //    /// and entities WITHOUT this comp are in staying state, so we need just to cache order changes
-        
-    //    var time = state.Time.ElapsedTime;
-
-    //    var gotUnderWayChangeAnimationJob = new ChangeAnimation
-    //    {
-    //        setToAnimationIndex = CharacterAnimations.Walk,
-    //        time = time
-    //    };
-    //    state.Dependency = gotUnderWayChangeAnimationJob.ScheduleParallelByRef(_gotUnderWayQuery, state.Dependency);
-
-    //    var stopedChangeAnimationJob = new ChangeAnimation
-    //    {
-    //        setToAnimationIndex = CharacterAnimations.Idle,
-    //        time = time
-    //    };
-    //    state.Dependency = stopedChangeAnimationJob.ScheduleParallel(_stopedQuery, state.Dependency);
-    //}
-
     protected override void OnCreate()
     {
         base.OnCreate();
         _gotUnderWayQuery = GetEntityQuery
         (
             ComponentType.Exclude<CullSpriteTag>(),
+
+            ComponentType.ReadWrite<AnimationIndex>(),
+            ComponentType.ReadWrite<AnimationTimer>(),
+            ComponentType.ReadWrite<FrameIndex>(),
+            ComponentType.ReadOnly<AnimationSetLink>(),
+
             ComponentType.ReadOnly<Destination>(),
             ComponentType.ReadOnly<MoveTimer>()
         );
@@ -95,6 +59,12 @@ public partial class MovableAnimationControllSystem : SystemBase
         _stopedQuery = GetEntityQuery
         (
             ComponentType.Exclude<CullSpriteTag>(),
+
+            ComponentType.ReadWrite<AnimationIndex>(),
+            ComponentType.ReadWrite<AnimationTimer>(),
+            ComponentType.ReadWrite<FrameIndex>(),
+            ComponentType.ReadOnly<AnimationSetLink>(),
+
             ComponentType.ReadOnly<Destination>(),
             ComponentType.Exclude<MoveTimer>()
         );
@@ -102,7 +72,7 @@ public partial class MovableAnimationControllSystem : SystemBase
     }
     protected override void OnUpdate()
     {
-        var time = Time.ElapsedTime;
+        var time = SystemAPI.Time.ElapsedTime;
 
         var gotUnderWayChangeAnimationJob = new ChangeAnimation
         {

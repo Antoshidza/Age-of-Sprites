@@ -15,7 +15,7 @@ namespace NSprites
         protected override void OnCreate()
         {
             base.OnCreate();
-            _spriteRenderingSystem = World.GetOrCreateSystem<SpriteRenderingSystem>();
+            _spriteRenderingSystem = World.GetOrCreateSystemManaged<SpriteRenderingSystem>();
             _renderArchetypeToRegistrateQuery = GetEntityQuery
             (
                 new EntityQueryDesc
@@ -66,7 +66,7 @@ namespace NSprites
                         _ = _registeredIDsSet.Add(renderData.data.ID);
                     }
 
-                    EntityManager.SetSharedComponentData(entity,new SpriteRenderID{ id = renderData.data.ID });
+                    EntityManager.SetSharedComponentManaged(entity,new SpriteRenderID{ id = renderData.data.ID });
                 }
             }
             Registrate(_renderArchetypeToRegistrateQuery.ToEntityArray(Allocator.Temp));

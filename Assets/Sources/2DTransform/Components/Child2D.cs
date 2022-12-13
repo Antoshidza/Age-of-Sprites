@@ -2,7 +2,7 @@
 
 namespace NSprites
 {
-    public struct Child2D : ISystemStateBufferElementData
+    public struct Child2D : ICleanupBufferElementData
     {
         public Entity value;
     }

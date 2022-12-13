@@ -1,34 +1,31 @@
-﻿using System.Collections.Generic;
+﻿using NSprites;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Serialization;
 
-public class SquadDefaultSettingsAuthoring : MonoBehaviour, IConvertGameObjectToEntity, IDeclareReferencedPrefabs
+public class SquadDefaultSettingsAuthoring : MonoBehaviour
 {
-    [SerializeField] private Sprite _soldierSprite;
-    [SerializeField] private int2 _animResolution = new(1,1);
-
-    [SerializeField] private GameObject _soldierView;
-    [SerializeField] private int2 _squadResolution;
-    [SerializeField] private float2 _soldierMargin;
-
-    public float2 VisualSize => new float2(_soldierSprite.bounds.size.x, _soldierSprite.bounds.size.y) / _animResolution;
-
-    public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
+    private class SquadDefaultSettingsBaker : Baker<SquadDefaultSettingsAuthoring>
     {
-        if (_soldierView == null || _soldierSprite == null)
-            return;
-
-        _ = dstManager.AddComponentData(entity, new SquadDefaultSettings
+        public override void Bake(SquadDefaultSettingsAuthoring authoring)
         {
-            soldierPrefab = conversionSystem.GetPrimaryEntity(_soldierView),
-            soldierSize = VisualSize,
-            defaultSettings = new SquadSettings { soldierMargin = _soldierMargin, squadResolution = _squadResolution }
-        });
+            if (authoring.SoldierView == null)
+                return;
+
+            AddComponent(new SquadDefaultSettings
+            {
+                soldierPrefab = GetEntity(authoring.SoldierView),
+                soldierSize = authoring.VisualSize,
+                defaultSettings = new SquadSettings { soldierMargin = authoring.SoldierMargin, squadResolution = authoring.SquadResolution }
+            });
+        }
     }
 
-    public void DeclareReferencedPrefabs(List<GameObject> referencedPrefabs)
-    {
-        referencedPrefabs.Add(_soldierView);
-    }
+    [FormerlySerializedAs("_animResolution ")] public int2 AnimResolution = new(1,1);
+    [FormerlySerializedAs("_soldierView")] public GameObject SoldierView;
+    [FormerlySerializedAs("_squadResolution")] public int2 SquadResolution;
+    [FormerlySerializedAs("_soldierMargin")] public float2 SoldierMargin;
+
+    public float2 VisualSize => SoldierView.TryGetComponent<BaseSpriteRendererAuthoring>(out var authoring) ? authoring.VisualSize : new(1f);
 }
