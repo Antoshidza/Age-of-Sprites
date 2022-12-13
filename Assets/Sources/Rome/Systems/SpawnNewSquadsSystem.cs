@@ -4,7 +4,6 @@ using Unity.Entities;
 using Unity.Mathematics;
 
 [BurstCompile]
-[AlwaysUpdateSystem]
 public partial struct SpawnNewSquadsSystem : ISystem
 {
     private EntityQuery _soldierRequireQuery;
@@ -31,8 +30,8 @@ public partial struct SpawnNewSquadsSystem : ISystem
     public void OnUpdate(ref SystemState state)
     {
         if (_soldierRequireQuery.CalculateChunkCount() != 0
-            || !state.TryGetSingleton<MapSettings>(out var mapSettings)
-            || !state.TryGetSingleton<SquadDefaultSettings>(out var squadDefaultSettings))
+            || !SystemAPI.TryGetSingleton<MapSettings>(out var mapSettings)
+            || !SystemAPI.TryGetSingleton<SquadDefaultSettings>(out var squadDefaultSettings))
             return;
 
         var rand = new Random((uint)System.DateTime.Now.Ticks);

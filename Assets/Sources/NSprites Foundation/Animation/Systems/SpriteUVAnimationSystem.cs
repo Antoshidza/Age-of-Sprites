@@ -1,34 +1,30 @@
-﻿using NSprites;
-using Unity.Mathematics;
+﻿using Unity.Mathematics;
 using Unity.Entities;
 using Unity.Burst;
 
-/// Compare <see cref="AnimationTimer"/> with global time and switch <see cref="FrameIndex"/> when timer expired.
-/// Perform only not-culled entities. Restore <see cref="FrameIndex"/> and duration time for entities which be culled for some time.
-/// 
-/// Somehow calculations goes a bit wrong and unculled entities gets synchronyzed, don't know how to fix
-[BurstCompile]
-public partial struct SpriteUVAnimationSystem : ISystem
+#pragma warning disable CS0282 // I guess because of DOTS's codegen
+// https://forum.unity.com/threads/compilation-of-issues-with-0-50.1253973/page-2#post-8512268
+
+namespace NSprites
 {
-    public void OnCreate(ref SystemState state)
+    /// Compare <see cref="AnimationTimer"/> with global time and switch <see cref="FrameIndex"/> when timer expired.
+    /// Perform only not-culled entities. Restore <see cref="FrameIndex"/> and duration time for entities which be culled for some time.
+    /// 
+    /// Somehow calculations goes a bit wrong and unculled entities gets synchronyzed, don't know how to fix
+    [BurstCompile]
+    public partial struct SpriteUVAnimationSystem : ISystem
     {
-    }
+        [BurstCompile]
+        [WithNone(typeof(CullSpriteTag))]
+        private partial struct AnimationJob : IJobEntity
+        {
+            public double time;
 
-    public void OnDestroy(ref SystemState state)
-    {
-    }
-
-    public void OnUpdate(ref SystemState state)
-    {
-        var time = state.Time.ElapsedTime;
-
-        state.Dependency = state.Entities
-            .WithNone<CullSpriteTag>()
-            .ForEach((ref AnimationTimer animationTimer,
-                                ref FrameIndex frameIndex,
-                                ref MainTexST mainTexST,
-                                in AnimationSetLink animationSet,
-                                in AnimationIndex animationIndex) =>
+            private void Execute(ref AnimationTimer animationTimer,
+                                    ref FrameIndex frameIndex,
+                                    ref MainTexST mainTexST,
+                                    in AnimationSetLink animationSet,
+                                    in AnimationIndex animationIndex)
             {
                 var timerDelta = time - animationTimer.value;
 
@@ -41,6 +37,7 @@ public partial struct SpriteUVAnimationSystem : ISystem
 
                     if (timerDelta >= animData.AnimationDuration)
                     {
+                        // TODO: try remove unecessary code
                         var prevIndex = frameIndex.value;
                         var prevFrameDuration = animData.FrameDurations[frameIndex.value];
 
@@ -60,7 +57,21 @@ public partial struct SpriteUVAnimationSystem : ISystem
                     var framePosition = new int2(frameIndex.value % animData.GridSize.x, frameIndex.value / animData.GridSize.x);
                     mainTexST = new MainTexST { value = new float4(frameSize, animData.MainTexSTOnAtlas.zw + frameSize * framePosition) };
                 }
-            })
-            .ScheduleParallel(state.Dependency);
+            }
+        }
+
+        public void OnCreate(ref SystemState state)
+        {
+        }
+
+        public void OnDestroy(ref SystemState state)
+        {
+        }
+
+        public void OnUpdate(ref SystemState state)
+        {
+            var animationJob = new AnimationJob { time = SystemAPI.Time.ElapsedTime };
+            state.Dependency = animationJob.ScheduleParallelByRef(state.Dependency);
+        }
     }
 }

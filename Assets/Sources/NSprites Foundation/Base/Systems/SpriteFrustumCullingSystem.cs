@@ -15,21 +15,24 @@ namespace NSprites
         [MenuItem("NSprites/Toggle frustum culling system")]
         public static void ToggleFrustumCullingSystem()
         {
-            var sys = World.DefaultGameObjectInjectionWorld.GetExistingSystem<SpriteFrustumCullingSystem>();
-            if (sys == null)
+            var systemHandle = World.DefaultGameObjectInjectionWorld.GetExistingSystem<SpriteFrustumCullingSystem>();
+
+            if (systemHandle == null)
                 return;
 
-            sys.Enabled = !sys.Enabled;
+            var systemState =  World.DefaultGameObjectInjectionWorld.Unmanaged.ResolveSystemStateRef(systemHandle);
 
-            if (!sys.Enabled)
-                sys.EntityManager.RemoveComponent(sys.GetEntityQuery(typeof(CullSpriteTag)), ComponentType.ReadOnly<CullSpriteTag>());
+            systemState.Enabled = !systemState.Enabled;
+
+            if (!systemState.Enabled)
+                systemState.EntityManager.RemoveComponent(systemState.GetEntityQuery(typeof(CullSpriteTag)), ComponentType.ReadOnly<CullSpriteTag>());
         }
 #endif
         protected override void OnCreate()
         {
             base.OnCreate();
             _camera = Camera.main;
-            _ecbSystem = World.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
+            _ecbSystem = World.GetOrCreateSystemManaged<EndSimulationEntityCommandBufferSystem>();
         }
         protected override void OnUpdate()
         {

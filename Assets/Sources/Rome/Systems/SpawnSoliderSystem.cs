@@ -5,11 +5,8 @@ using UnityEngine;
 [BurstCompile]
 public partial struct SpawnSoliderSystem : ISystem
 {
-    private EntityCommandBufferSystem _ecbSystem;
-
     public void OnCreate(ref SystemState state)
     {
-        _ecbSystem = state.World.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
     }
 
     public void OnDestroy(ref SystemState state)
@@ -21,11 +18,9 @@ public partial struct SpawnSoliderSystem : ISystem
         if (!Input.GetKey(KeyCode.A))
             return;
 
-        if (!state.TryGetSingleton<SquadDefaultSettings>(out var squadSettings))
+        if (!SystemAPI.TryGetSingleton<SquadDefaultSettings>(out var squadSettings))
             return;
 
-        var ecb = _ecbSystem.CreateCommandBuffer();
-
-        ecb.Instantiate(squadSettings.soldierPrefab);
+        _ = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged).Instantiate(squadSettings.soldierPrefab);
     }
 }
