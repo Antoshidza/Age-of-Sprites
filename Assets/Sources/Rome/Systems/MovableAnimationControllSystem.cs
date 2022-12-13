@@ -5,8 +5,7 @@ using Unity.Entities;
 #pragma warning disable CS0282 // I guess because of DOTS's codegen
 // https://forum.unity.com/threads/compilation-of-issues-with-0-50.1253973/page-2#post-8512268
 
-// TODO: for some reason I can't combine IJobEntity with ISystem, so try to uncomment stuff in 1.0
-public partial class MovableAnimationControllSystem : SystemBase
+public partial struct MovableAnimationControllSystem : ISystem
 {
     [BurstCompile]
     private partial struct ChangeAnimation : IJobEntity
@@ -40,10 +39,9 @@ public partial class MovableAnimationControllSystem : SystemBase
     private EntityQuery _gotUnderWayQuery;
     private EntityQuery _stopedQuery;
 
-    protected override void OnCreate()
+    public void OnCreate(ref SystemState state)
     {
-        base.OnCreate();
-        _gotUnderWayQuery = GetEntityQuery
+        _gotUnderWayQuery = state.GetEntityQuery
         (
             ComponentType.Exclude<CullSpriteTag>(),
 
@@ -56,7 +54,7 @@ public partial class MovableAnimationControllSystem : SystemBase
             ComponentType.ReadOnly<MoveTimer>()
         );
         _gotUnderWayQuery.AddOrderVersionFilter();
-        _stopedQuery = GetEntityQuery
+        _stopedQuery = state.GetEntityQuery
         (
             ComponentType.Exclude<CullSpriteTag>(),
 
@@ -70,7 +68,12 @@ public partial class MovableAnimationControllSystem : SystemBase
         );
         _stopedQuery.AddOrderVersionFilter();
     }
-    protected override void OnUpdate()
+
+    public void OnDestroy(ref SystemState state)
+    {
+    }
+
+    public void OnUpdate(ref SystemState state)
     {
         var time = SystemAPI.Time.ElapsedTime;
 
@@ -79,13 +82,13 @@ public partial class MovableAnimationControllSystem : SystemBase
             setToAnimationID = CharacterAnimations.Walk,
             time = time
         };
-        Dependency = gotUnderWayChangeAnimationJob.ScheduleParallelByRef(_gotUnderWayQuery, Dependency);
+        state.Dependency = gotUnderWayChangeAnimationJob.ScheduleParallelByRef(_gotUnderWayQuery, state.Dependency);
 
         var stopedChangeAnimationJob = new ChangeAnimation
         {
             setToAnimationID = CharacterAnimations.Idle,
             time = time
         };
-        Dependency = stopedChangeAnimationJob.ScheduleParallel(_stopedQuery, Dependency);
+        state.Dependency = stopedChangeAnimationJob.ScheduleParallel(_stopedQuery, state.Dependency);
     }
 }

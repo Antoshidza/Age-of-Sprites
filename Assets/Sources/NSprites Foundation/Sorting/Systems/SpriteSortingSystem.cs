@@ -123,7 +123,6 @@ namespace NSprites
         private const float PerLayerOffset = 1f / LayerCount;
         private EntityQuery _sortingSpritesQuery;
         private EntityQuery _sortingStaticSpritesQuery;
-        private EntityQuery _sortingStaticOrderChangedSpritesQuery;
         private List<SortingLayer> _sortingLayers;
 
         protected override void OnCreate()
@@ -154,18 +153,15 @@ namespace NSprites
                 ComponentType.ReadOnly<SortingStaticTag>()
             );
 
-            // TODO: after updating to 1.0 use EntityQuery.ResetFilter instead of having special query.
-            // in 0.51 there is no resetting for order version filter
-            _sortingStaticOrderChangedSpritesQuery = _sortingStaticSpritesQuery;
-            _sortingStaticOrderChangedSpritesQuery.AddOrderVersionFilter();
-
             _sortingLayers = new List<SortingLayer>();
         }
 
         protected override void OnUpdate()
         {
             var sortingSpritesIsEmpty = _sortingSpritesQuery.IsEmpty;
-            var sortingStaticSpritesIsEmpty = _sortingStaticOrderChangedSpritesQuery.IsEmpty;
+            _sortingSpritesQuery.AddOrderVersionFilter();
+            var sortingStaticSpritesIsEmpty = _sortingSpritesQuery.IsEmpty;
+            _sortingSpritesQuery.ResetFilter();
 
             if (sortingSpritesIsEmpty && sortingStaticSpritesIsEmpty)
                 return;

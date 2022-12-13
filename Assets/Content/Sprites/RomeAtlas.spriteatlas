@@ -128,5 +128,5 @@ SpriteAtlas:
   - legion_walk
   - legion_idle
   m_RenderDataMap: {}
-  m_Tag: HumanAtlas
+  m_Tag: RomeAtlas
   m_IsVariant: 0

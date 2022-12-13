@@ -37,10 +37,6 @@ namespace NSprites
 
                     if (timerDelta >= animData.AnimationDuration)
                     {
-                        // TODO: try remove unecessary code
-                        var prevIndex = frameIndex.value;
-                        var prevFrameDuration = animData.FrameDurations[frameIndex.value];
-
                         var extraTime = (float)(timerDelta % animData.AnimationDuration);
                         while (extraTime > nextFrameDuration)
                         {
