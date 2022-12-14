@@ -32,4 +32,7 @@ public struct SquadDefaultSettings : IComponentData, IEquatable<SquadDefaultSett
     {
         return squadResolution * (2 * soldierMargine + 1f) * soldierSize;
     }
+
+    public override bool Equals(object obj) => base.Equals(obj);
+    public override int GetHashCode() => base.GetHashCode();
 }

@@ -7,6 +7,7 @@ using Unity.Jobs;
 using Unity.Jobs.LowLevel.Unsafe;
 using Unity.Mathematics;
 
+[BurstCompile]
 public partial struct GenerateMapSystem : ISystem
 {
     [BurstCompile]

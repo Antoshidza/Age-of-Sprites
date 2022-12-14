@@ -24,10 +24,10 @@ namespace NSprites
             public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
             {
                 //if position or child set was changed then we need update children hierarchically
-                var needUpdate = chunk.DidChange(/*ref */worldPosition_CTH, lastSystemVersion) && chunk.DidChange(/*ref */child_BTH, lastSystemVersion);
+                var needUpdate = chunk.DidChange(ref worldPosition_CTH, lastSystemVersion) && chunk.DidChange(ref child_BTH, lastSystemVersion);
 
-                var chunkWorldPosition = chunk.GetNativeArray(/*ref*/ worldPosition_CTH);
-                var chunkChild = chunk.GetBufferAccessor(/*ref*/ child_BTH);
+                var chunkWorldPosition = chunk.GetNativeArray(ref worldPosition_CTH);
+                var chunkChild = chunk.GetBufferAccessor(ref child_BTH);
 
                 for (int entityIndex = 0; entityIndex < chunk.Count; entityIndex++)
                 {

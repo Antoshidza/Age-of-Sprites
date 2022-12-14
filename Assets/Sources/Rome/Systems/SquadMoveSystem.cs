@@ -34,14 +34,14 @@ public partial struct SquadMoveSystem : ISystem
 
         public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
         {
-            var positions = chunk.GetNativeArray(worldPos2D_CTH_RO);
-            var soldierBufferAccessor = chunk.GetBufferAccessor(soldierLink_BTH_RO);
+            var positions = chunk.GetNativeArray(ref worldPos2D_CTH_RO);
+            var soldierBufferAccessor = chunk.GetBufferAccessor(ref soldierLink_BTH_RO);
 
-            if (chunk.DidChange(worldPos2D_CTH_RO, lastSystemVersion))
+            if (chunk.DidChange(ref worldPos2D_CTH_RO, lastSystemVersion))
             {
-                var prevPositions = chunk.GetNativeArray(prevPos_CTH_RW);
+                var prevPositions = chunk.GetNativeArray(ref prevPos_CTH_RW);
 
-                var squadSettingsArray = chunk.GetNativeArray(squadSettings_CTH_RO);
+                var squadSettingsArray = chunk.GetNativeArray(ref squadSettings_CTH_RO);
                 for (int squadIndex = 0; squadIndex < positions.Length; squadIndex++)
                 {
                     var pos = positions[squadIndex].value;
@@ -52,9 +52,9 @@ public partial struct SquadMoveSystem : ISystem
                     }
                 }
             }
-            else if (chunk.DidChange(soldierLink_BTH_RO, lastSystemVersion))
+            else if (chunk.DidChange(ref soldierLink_BTH_RO, lastSystemVersion))
             {
-                var squadSettingsArray = chunk.GetNativeArray(squadSettings_CTH_RO);
+                var squadSettingsArray = chunk.GetNativeArray(ref squadSettings_CTH_RO);
                 for (int squadIndex = 0; squadIndex < positions.Length; squadIndex++)
                     MoveSoldiers(squadSettingsArray[squadIndex], squadDefaultSettings.soldierSize, soldierBufferAccessor[squadIndex], positions[squadIndex].value, ref destination_CL_WO);
             }
@@ -89,15 +89,13 @@ public partial struct SquadMoveSystem : ISystem
         if (!SystemAPI.TryGetSingleton<SquadDefaultSettings>(out var squadDefaultSettings))
             return;
 
-        var destination_CL_WO = state.GetComponentLookup<Destination>(false);
-
         if (_prevSquadSettings != squadDefaultSettings)
         {
             _prevSquadSettings = squadDefaultSettings;
 
             var moveOnSettingChangeJob = new MoveOnChangeGlobalSettingsJob
             {
-                destination_CL = destination_CL_WO,
+                destination_CL = SystemAPI.GetComponentLookup<Destination>(false),
                 squadDefaultSettings = squadDefaultSettings
             };
             state.Dependency = moveOnSettingChangeJob.ScheduleParallelByRef(state.Dependency);
@@ -108,11 +106,11 @@ public partial struct SquadMoveSystem : ISystem
             {
                 lastSystemVersion = state.LastSystemVersion,
                 squadDefaultSettings = squadDefaultSettings,
-                squadSettings_CTH_RO = state.GetComponentTypeHandle<SquadSettings>(true),
-                worldPos2D_CTH_RO = state.GetComponentTypeHandle<WorldPosition2D>(true),
-                destination_CL_WO = state.GetComponentLookup<Destination>(false),
-                prevPos_CTH_RW = state.GetComponentTypeHandle<PrevWorldPosition2D>(false),
-                soldierLink_BTH_RO = state.GetBufferTypeHandle<SoldierLink>(true)
+                squadSettings_CTH_RO = SystemAPI.GetComponentTypeHandle<SquadSettings>(true),
+                worldPos2D_CTH_RO = SystemAPI.GetComponentTypeHandle<WorldPosition2D>(true),
+                destination_CL_WO = SystemAPI.GetComponentLookup<Destination>(false),
+                prevPos_CTH_RW = SystemAPI.GetComponentTypeHandle<PrevWorldPosition2D>(false),
+                soldierLink_BTH_RO = SystemAPI.GetBufferTypeHandle<SoldierLink>(true)
             };
             state.Dependency = moveJob.ScheduleParallelByRef(_squadQuery, state.Dependency);
         }

@@ -7,6 +7,9 @@ using Unity.Mathematics;
 using UnityEditor;
 using UnityEngine;
 
+#pragma warning disable CS0282 // I guess because of DOTS's codegen
+// https://forum.unity.com/threads/compilation-of-issues-with-0-50.1253973/page-2#post-8512268
+
 [WorldSystemFilter(WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor)]
 [UpdateInGroup(typeof(PresentationSystemGroup))]
 [UpdateAfter(typeof(SpriteRenderingSystem))]

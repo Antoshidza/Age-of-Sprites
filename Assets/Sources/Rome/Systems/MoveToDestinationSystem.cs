@@ -28,16 +28,16 @@ public partial struct MoveToDestinationSystem : ISystem
 
         public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
         {
-            if (chunk.DidChange(/*ref*/ destionation_CTH_RO, lastSystemVersion)
-                || chunk.DidChange(/*ref*/ moveSpeed_CTH_RO, lastSystemVersion))
+            if (chunk.DidChange(ref destionation_CTH_RO, lastSystemVersion)
+                || chunk.DidChange(ref moveSpeed_CTH_RO, lastSystemVersion))
             {
                 var entities = chunk.GetNativeArray(entityTypeHandle);
-                var worldPositions = chunk.GetNativeArray(/*ref*/ worldPosition2D_CTH_RO);
-                var moveSpeeds = chunk.GetNativeArray(/*ref*/ moveSpeed_CTH_RO);
-                var destionations = chunk.GetNativeArray(/*ref*/ destionation_CTH_RO);
-                var timers = chunk.GetNativeArray(/*ref*/ moveTimer_CTH_RW);
+                var worldPositions = chunk.GetNativeArray(ref worldPosition2D_CTH_RO);
+                var moveSpeeds = chunk.GetNativeArray(ref moveSpeed_CTH_RO);
+                var destionations = chunk.GetNativeArray(ref destionation_CTH_RO);
+                var timers = chunk.GetNativeArray(ref moveTimer_CTH_RW);
 
-                if (chunk.Has(/*ref*/ moveTimer_CTH_RW))
+                if (chunk.Has(ref moveTimer_CTH_RW))
                     for (int entityIndex = 0; entityIndex < worldPositions.Length; entityIndex++)
                         timers[entityIndex] = new MoveTimer { remainingTime = GetRamainingTime(worldPositions[entityIndex].value, destionations[entityIndex].value, moveSpeeds[entityIndex].value) };
                 else
@@ -98,11 +98,11 @@ public partial struct MoveToDestinationSystem : ISystem
         /// [re]calculate <see cref="MoveTimer"/> if <see cref="MoveSpeed"/> or <see cref="Destination"/> was changed
         var calculateMoveTimerJob = new CalculateMoveTimerJob
         {
-            entityTypeHandle = state.GetEntityTypeHandle(),
-            moveTimer_CTH_RW = state.GetComponentTypeHandle<MoveTimer>(false),
-            moveSpeed_CTH_RO = state.GetComponentTypeHandle<MoveSpeed>(true),
-            worldPosition2D_CTH_RO = state.GetComponentTypeHandle<WorldPosition2D>(true),
-            destionation_CTH_RO = state.GetComponentTypeHandle<Destination>(true),
+            entityTypeHandle = SystemAPI.GetEntityTypeHandle(),
+            moveTimer_CTH_RW = SystemAPI.GetComponentTypeHandle<MoveTimer>(false),
+            moveSpeed_CTH_RO = SystemAPI.GetComponentTypeHandle<MoveSpeed>(true),
+            worldPosition2D_CTH_RO = SystemAPI.GetComponentTypeHandle<WorldPosition2D>(true),
+            destionation_CTH_RO = SystemAPI.GetComponentTypeHandle<Destination>(true),
             ecb = ecbSystem.CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter(),
             lastSystemVersion = state.LastSystemVersion
         };

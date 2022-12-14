@@ -4,6 +4,9 @@ using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
 
+#pragma warning disable CS0282 // I guess because of DOTS's codegen
+// https://forum.unity.com/threads/compilation-of-issues-with-0-50.1253973/page-2#post-8512268
+
 [BurstCompile]
 public partial struct SoldierDistributionSystem : ISystem
 {
@@ -86,8 +89,8 @@ public partial struct SoldierDistributionSystem : ISystem
             requireSoldierData = requireSoldierData,
             soldierEntities = soldierEntities,
             ecb = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged),
-            soldierLink_BFE = state.GetBufferLookup<SoldierLink>(false),
-            requireSoldier_CDFE_WO = state.GetComponentLookup<RequireSoldier>(false)
+            soldierLink_BFE = SystemAPI.GetBufferLookup<SoldierLink>(false),
+            requireSoldier_CDFE_WO = SystemAPI.GetComponentLookup<RequireSoldier>(false)
         };
 
         var inputHandles = new NativeArray<JobHandle>(4, Allocator.Temp);

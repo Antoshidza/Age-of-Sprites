@@ -1,6 +1,5 @@
 ﻿using Unity.Entities;
 using Unity.Burst;
-using Unity.Mathematics;
 
 namespace NSprites
 {
@@ -10,12 +9,11 @@ namespace NSprites
         [WorldSystemFilter(WorldSystemFilterFlags.BakingSystem)]
         private partial struct SpriteRendererBakingSystem : ISystem
         {
-            public void OnCreate(ref SystemState state) {}
-            public void OnDestroy(ref SystemState state) {}
-            public void OnUpdate(ref SystemState state)
+            private EntityQuery _query;
+
+            public void OnCreate(ref SystemState state)
             {
-                // add sprite render components to each entity which will be registered as sprite
-                var query = state.GetEntityQuery
+                _query = state.GetEntityQuery
                 (
                     new EntityQueryDesc
                     {
@@ -23,7 +21,12 @@ namespace NSprites
                         Options = EntityQueryOptions.IncludePrefab
                     }
                 );
-                state.EntityManager.AddSpriteRenderComponents(query);
+            }
+            public void OnDestroy(ref SystemState state) {}
+            public void OnUpdate(ref SystemState state)
+            {
+                // add sprite render components to each entity which will be registered as sprite
+                state.EntityManager.AddSpriteRenderComponents(_query);
             }
         }
         private class SpriteRendererBaker : Baker<SpriteRendererAuthoring>

@@ -38,8 +38,8 @@ namespace NSprites
 
             public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
             {
-                var chunkParents = chunk.GetNativeArray(/*ref*/ parent_CTH);
-                var chunkLastParents = chunk.GetNativeArray(/*ref*/ lastParent_CTH);
+                var chunkParents = chunk.GetNativeArray(ref parent_CTH);
+                var chunkLastParents = chunk.GetNativeArray(ref lastParent_CTH);
                 var entities = chunk.GetNativeArray(entityTypeHandle);
 
                 for (int entityIndex = 0; entityIndex < chunk.Count; entityIndex++)
@@ -76,7 +76,7 @@ namespace NSprites
             public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
             {
                 var chunkEntities = chunk.GetNativeArray(entityTypeHandle);
-                var chunkLastParents = chunk.GetNativeArray(/*ref*/ lastParent_CTH);
+                var chunkLastParents = chunk.GetNativeArray(ref lastParent_CTH);
 
                 for (int entityIndex = 0; entityIndex < chunk.Count; entityIndex++)
                 {
@@ -189,7 +189,7 @@ namespace NSprites
             public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
             {
                 var chunkEntities = chunk.GetNativeArray(entityTypeHandle);
-                var chunkChildren = chunk.GetBufferAccessor(/*ref */child_BTH);
+                var chunkChildren = chunk.GetBufferAccessor(ref child_BTH);
 
                 for (int entityIndex = 0; entityIndex < chunk.Count; entityIndex++)
                 {

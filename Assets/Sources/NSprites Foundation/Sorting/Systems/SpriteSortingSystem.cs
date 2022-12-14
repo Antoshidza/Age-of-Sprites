@@ -60,8 +60,8 @@ namespace NSprites
             public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
             {
                 var entityArray = chunk.GetNativeArray(entityTypeHandle);
-                var worldPosition2DArray = chunk.GetNativeArray(worldPosition2D_CTH);
-                var sortingIndexes = chunk.GetNativeArray(sortingIndex_CTH);
+                var worldPosition2DArray = chunk.GetNativeArray(ref worldPosition2D_CTH);
+                var sortingIndexes = chunk.GetNativeArray(ref sortingIndex_CTH);
                 var firstEntityIndex = chunkBasedEntityIndeces[unfilteredChunkIndex];
                 for (int entityIndex = 0; entityIndex < entityArray.Length; entityIndex++)
                 {
@@ -113,7 +113,7 @@ namespace NSprites
 
             public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
             {
-                var chunkSortingValues = chunk.GetNativeArray(sortingValue_CTH_WO);
+                var chunkSortingValues = chunk.GetNativeArray(ref sortingValue_CTH_WO);
                 NativeArray<SortingValue>.Copy(sortingValues, chunkBasedEntityIndeces[unfilteredChunkIndex], chunkSortingValues, 0, chunkSortingValues.Length);
             }
         }

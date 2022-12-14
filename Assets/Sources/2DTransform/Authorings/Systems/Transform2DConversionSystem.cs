@@ -45,7 +45,7 @@ namespace NSprites
                             ecb.AddComponent(entity, new LocalPosition2D { value = worldPosition - parentWorldPosition });
                             ecb.AddComponent(entity, new Parent2D { value = parentEntity });
                             _ = EntityManager.HasComponent<Child2D>(parentEntity)
-                                    ? GetBuffer<Child2D>(parentEntity)
+                                    ? SystemAPI.GetBuffer<Child2D>(parentEntity)
                                     : ecb.AddBuffer<Child2D>(parentEntity);
                         }
 

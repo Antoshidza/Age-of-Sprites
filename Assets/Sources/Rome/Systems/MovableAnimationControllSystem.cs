@@ -5,6 +5,7 @@ using Unity.Entities;
 #pragma warning disable CS0282 // I guess because of DOTS's codegen
 // https://forum.unity.com/threads/compilation-of-issues-with-0-50.1253973/page-2#post-8512268
 
+[BurstCompile]
 public partial struct MovableAnimationControllSystem : ISystem
 {
     [BurstCompile]

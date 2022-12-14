@@ -1,9 +1,14 @@
 ﻿using NSprites;
+using Unity.Burst;
 using Unity.Entities;
 using UnityEngine;
 
+#pragma warning disable CS0282 // I guess because of DOTS's codegen
+// https://forum.unity.com/threads/compilation-of-issues-with-0-50.1253973/page-2#post-8512268
+
 [WorldSystemFilter(WorldSystemFilterFlags.Default)]
 [UpdateInGroup(typeof(SimulationSystemGroup))]
+[BurstCompile]
 public partial struct SquadSpawnSystem : ISystem
 {
     private EntityArchetype _squadArchetype;
