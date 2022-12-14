@@ -1,12 +1,13 @@
 {
   "dependencies": {
     "com.tonymax.nsprites": {
-      "version": "file:com.nsprites",
+      "version": "https://github.com/Antoshidza/NSprites.git",
       "depth": 0,
-      "source": "embedded",
+      "source": "git",
       "dependencies": {
         "com.unity.entities": "1.0.0-pre.15"
-      }
+      },
+      "hash": "aedf3b99f0231f34b16e383b883cbb7952b75984"
     },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
