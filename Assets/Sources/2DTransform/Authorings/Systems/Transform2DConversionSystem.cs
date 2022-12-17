@@ -1,4 +1,5 @@
-﻿using Unity.Collections;
+﻿#if UNITY_EDITOR
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
@@ -87,3 +88,4 @@ namespace NSprites
         }
     }
 }
+#endif

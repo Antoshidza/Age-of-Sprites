@@ -1,7 +1,5 @@
-#if UNITY_EDITOR
 using System.Collections.Generic;
 using Unity.Mathematics;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Layouts;
@@ -9,6 +7,8 @@ using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.InputSystem.Utilities;
 using TouchPhase = UnityEngine.InputSystem.TouchPhase;
 
+#if UNITY_EDITOR
+using UnityEditor;
 [InitializeOnLoad]
 #endif
 [DisplayStringFormat("{firstTouch}+{secondTouch}")]
