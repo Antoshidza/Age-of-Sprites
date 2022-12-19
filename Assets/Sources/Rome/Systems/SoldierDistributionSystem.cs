@@ -10,9 +10,6 @@ using Unity.Mathematics;
 [BurstCompile]
 public partial struct SoldierDistributionSystem : ISystem
 {
-    private EntityQuery _soldierLessSquadQuery;
-    private EntityQuery _freeSoldiersQuery;
-
     [BurstCompile]
     private struct DistributeJob : IJob
     {
@@ -64,14 +61,22 @@ public partial struct SoldierDistributionSystem : ISystem
         }
     }
 
+    private struct SystemData : IComponentData
+    {
+        public EntityQuery soldierLessSquadQuery;
+        public EntityQuery freeSoldiersQuery;
+    }
+
     public void OnCreate(ref SystemState state)
     {
-        _soldierLessSquadQuery = state.GetEntityQuery(typeof(RequireSoldier));
-        _freeSoldiersQuery = state.GetEntityQuery
+        var systemData = new SystemData();
+        systemData.soldierLessSquadQuery = state.GetEntityQuery(typeof(RequireSoldier));
+        systemData.freeSoldiersQuery = state.GetEntityQuery
         (
             ComponentType.ReadOnly<SoldierTag>(),
             ComponentType.Exclude<InSquadSoldierTag>()
         );
+        state.EntityManager.AddComponentData(state.SystemHandle, systemData);
     }
 
     public void OnDestroy(ref SystemState state)
@@ -80,9 +85,10 @@ public partial struct SoldierDistributionSystem : ISystem
 
     public void OnUpdate(ref SystemState state)
     {
-        var squadEntities = _soldierLessSquadQuery.ToEntityListAsync(Allocator.TempJob, out var squadEntities_GatherHandle);
-        var requireSoldierData = _soldierLessSquadQuery.ToComponentDataListAsync<RequireSoldier>(Allocator.TempJob, state.Dependency, out var requireSoldier_GatherHandle);
-        var soldierEntities = _freeSoldiersQuery.ToEntityListAsync(Allocator.TempJob, out var soldierEntities_GatherHandle);
+        var systemData = SystemAPI.GetComponent<SystemData>(state.SystemHandle);
+        var squadEntities = systemData.soldierLessSquadQuery.ToEntityListAsync(Allocator.TempJob, out var squadEntities_GatherHandle);
+        var requireSoldierData = systemData.soldierLessSquadQuery.ToComponentDataListAsync<RequireSoldier>(Allocator.TempJob, state.Dependency, out var requireSoldier_GatherHandle);
+        var soldierEntities = systemData.freeSoldiersQuery.ToEntityListAsync(Allocator.TempJob, out var soldierEntities_GatherHandle);
         var distributeJob = new DistributeJob
         {
             squadEntities = squadEntities,

@@ -11,17 +11,24 @@ using UnityEngine;
 [BurstCompile]
 public partial struct SquadSpawnSystem : ISystem
 {
-    private EntityArchetype _squadArchetype;
+    private struct SystemData : IComponentData
+    {
+        public EntityArchetype squadArchetype;
+    }
 
     public void OnCreate(ref SystemState state)
     {
-        _squadArchetype = state.EntityManager.CreateArchetype
-        (
-            ComponentType.ReadOnly<WorldPosition2D>(),
-            ComponentType.ReadOnly<PrevWorldPosition2D>(),
-            ComponentType.ReadOnly<SoldierLink>(),
-            ComponentType.ReadOnly<RequireSoldier>()
-        );
+        var systemData = new SystemData
+        {
+            squadArchetype = state.EntityManager.CreateArchetype
+            (
+                ComponentType.ReadOnly<WorldPosition2D>(),
+                ComponentType.ReadOnly<PrevWorldPosition2D>(),
+                ComponentType.ReadOnly<SoldierLink>(),
+                ComponentType.ReadOnly<RequireSoldier>()
+            )
+        };
+        _ = state.EntityManager.AddComponentData(state.SystemHandle, systemData);
     }
 
     public void OnDestroy(ref SystemState state)
@@ -32,12 +39,14 @@ public partial struct SquadSpawnSystem : ISystem
     {
         if (!Input.GetKeyDown(KeyCode.S))
             return;
+
+        var systemData = SystemAPI.GetComponent<SystemData>(state.SystemHandle);
         
         var ecb = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged);
         var squadSettings = SystemAPI.GetSingleton<SquadDefaultSettings>();
         var soldierCount = squadSettings.SoldierCount;
 
-        var squadEntity = ecb.CreateEntity(_squadArchetype);
+        var squadEntity = ecb.CreateEntity(systemData.squadArchetype);
         ecb.SetComponent(squadEntity, new RequireSoldier { count = soldierCount });
     }
 }

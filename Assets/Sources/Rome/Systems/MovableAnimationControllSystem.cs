@@ -36,13 +36,16 @@ public partial struct MovableAnimationControllSystem : ISystem
             }
         }
     }
-
-    private EntityQuery _gotUnderWayQuery;
-    private EntityQuery _stopedQuery;
+    private struct SystemData : IComponentData
+    {
+        public EntityQuery gotUnderWayQuery;
+        public EntityQuery stopedQuery;
+    }
 
     public void OnCreate(ref SystemState state)
     {
-        _gotUnderWayQuery = state.GetEntityQuery
+        var systemData = new SystemData();
+        var gotUnderWayQuery = state.GetEntityQuery
         (
             ComponentType.Exclude<CullSpriteTag>(),
 
@@ -54,8 +57,9 @@ public partial struct MovableAnimationControllSystem : ISystem
             ComponentType.ReadOnly<Destination>(),
             ComponentType.ReadOnly<MoveTimer>()
         );
-        _gotUnderWayQuery.AddOrderVersionFilter();
-        _stopedQuery = state.GetEntityQuery
+        gotUnderWayQuery.AddOrderVersionFilter();
+        systemData.gotUnderWayQuery = gotUnderWayQuery;
+        var stopedQuery = state.GetEntityQuery
         (
             ComponentType.Exclude<CullSpriteTag>(),
 
@@ -67,7 +71,9 @@ public partial struct MovableAnimationControllSystem : ISystem
             ComponentType.ReadOnly<Destination>(),
             ComponentType.Exclude<MoveTimer>()
         );
-        _stopedQuery.AddOrderVersionFilter();
+        stopedQuery.AddOrderVersionFilter();
+        systemData.stopedQuery = stopedQuery;
+        _ = state.EntityManager.AddComponentData(state.SystemHandle, systemData);
     }
 
     public void OnDestroy(ref SystemState state)
@@ -76,6 +82,7 @@ public partial struct MovableAnimationControllSystem : ISystem
 
     public void OnUpdate(ref SystemState state)
     {
+        var systemData = SystemAPI.GetComponent<SystemData>(state.SystemHandle);
         var time = SystemAPI.Time.ElapsedTime;
 
         var gotUnderWayChangeAnimationJob = new ChangeAnimation
@@ -83,13 +90,13 @@ public partial struct MovableAnimationControllSystem : ISystem
             setToAnimationID = CharacterAnimations.Walk,
             time = time
         };
-        state.Dependency = gotUnderWayChangeAnimationJob.ScheduleParallelByRef(_gotUnderWayQuery, state.Dependency);
+        state.Dependency = gotUnderWayChangeAnimationJob.ScheduleParallelByRef(systemData.gotUnderWayQuery, state.Dependency);
 
         var stopedChangeAnimationJob = new ChangeAnimation
         {
             setToAnimationID = CharacterAnimations.Idle,
             time = time
         };
-        state.Dependency = stopedChangeAnimationJob.ScheduleParallel(_stopedQuery, state.Dependency);
+        state.Dependency = stopedChangeAnimationJob.ScheduleParallel(systemData.stopedQuery, state.Dependency);
     }
 }

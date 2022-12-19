@@ -75,16 +75,21 @@ public partial struct MoveToDestinationSystem : ISystem
     }
     #endregion
 
-    private EntityQuery _movableQuery;
+    private struct SystemData : IComponentData
+    {
+        public EntityQuery movableQuery;
+    }
 
     public void OnCreate(ref SystemState state)
     {
-        _movableQuery = state.GetEntityQuery
+        var systemData = new SystemData();
+        systemData.movableQuery = state.GetEntityQuery
         (
             ComponentType.ReadOnly<MoveSpeed>(),
             ComponentType.ReadOnly<WorldPosition2D>(),
             ComponentType.ReadOnly<Destination>()
         );
+        _ = state.EntityManager.AddComponentData(state.SystemHandle, systemData);
     }
 
     public void OnDestroy(ref SystemState state)
@@ -93,6 +98,7 @@ public partial struct MoveToDestinationSystem : ISystem
 
     public void OnUpdate(ref SystemState state)
     {
+        var systemData = SystemAPI.GetComponent<SystemData>(state.SystemHandle);
         var ecbSystem = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
 
         /// [re]calculate <see cref="MoveTimer"/> if <see cref="MoveSpeed"/> or <see cref="Destination"/> was changed
@@ -106,7 +112,7 @@ public partial struct MoveToDestinationSystem : ISystem
             ecb = ecbSystem.CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter(),
             lastSystemVersion = state.LastSystemVersion
         };
-        state.Dependency = calculateMoveTimerJob.ScheduleParallelByRef(_movableQuery, state.Dependency);
+        state.Dependency = calculateMoveTimerJob.ScheduleParallelByRef(systemData.movableQuery, state.Dependency);
 
         var moveJob = new MoveJob
         {

@@ -17,8 +17,7 @@ public partial struct GenerateMapSystem : ISystem
         public float2x2 mapSize;
         [ReadOnly] public NativeArray<Entity> rocks;
         [NativeDisableParallelForRestriction] public NativeArray<Random> posRands;
-        [NativeSetThreadIndex]
-        private int _threadIndex;
+        [NativeSetThreadIndex] private int _threadIndex;
 
         public void Execute(int startIndex, int count)
         {
@@ -27,7 +26,6 @@ public partial struct GenerateMapSystem : ISystem
                 var rand = posRands[_threadIndex];
                 var rockEntity = ecb.Instantiate(i, rocks[rand.NextInt(0, rocks.Length)]);
                 ecb.SetComponent(i, rockEntity, new WorldPosition2D { value = rand.NextFloat2(mapSize.c0, mapSize.c1) });
-                //ecb.SetComponent(i, rockEntity, new SpriteColor { color = new UnityEngine.Color(rand.NextFloat(0f, 1f), rand.NextFloat(0f, 1f), rand.NextFloat(0f, 1f)) });
                 posRands[_threadIndex] = rand;
             }
         }

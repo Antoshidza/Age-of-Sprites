@@ -9,21 +9,28 @@ using Unity.Mathematics;
 [BurstCompile]
 public partial struct SpawnNewSquadsSystem : ISystem
 {
-    private EntityQuery _soldierRequireQuery;
-    private EntityArchetype _squadArchetype;
+    private struct SystemData : IComponentData
+    {
+        public EntityQuery soldierRequireQuery;
+        public EntityArchetype squadArchetype;
+    }
 
     public void OnCreate(ref SystemState state)
     {
-        _soldierRequireQuery = state.GetEntityQuery(typeof(RequireSoldier));
-        _squadArchetype = state.EntityManager.CreateArchetype
-        (
-            typeof(SoldierLink),
-            typeof(RequireSoldier),
-            typeof(SquadSettings),
+        var systemData = new SystemData
+        {
+            soldierRequireQuery = state.GetEntityQuery(typeof(RequireSoldier)),
+            squadArchetype = state.EntityManager.CreateArchetype
+            (
+                typeof(SoldierLink),
+                typeof(RequireSoldier),
+                typeof(SquadSettings),
 
-            typeof(WorldPosition2D),
-            typeof(PrevWorldPosition2D)
-        );
+                typeof(WorldPosition2D),
+                typeof(PrevWorldPosition2D)
+            )
+        };
+        _ = state.EntityManager.AddComponentData(state.SystemHandle, systemData);
     }
 
     public void OnDestroy(ref SystemState state)
@@ -32,7 +39,8 @@ public partial struct SpawnNewSquadsSystem : ISystem
 
     public void OnUpdate(ref SystemState state)
     {
-        if (_soldierRequireQuery.CalculateChunkCount() != 0
+        var systemData = SystemAPI.GetComponent<SystemData>(state.SystemHandle);
+        if (systemData.soldierRequireQuery.CalculateChunkCount() != 0
             || !SystemAPI.TryGetSingleton<MapSettings>(out var mapSettings)
             || !SystemAPI.TryGetSingleton<SquadDefaultSettings>(out var squadDefaultSettings))
             return;
@@ -42,7 +50,7 @@ public partial struct SpawnNewSquadsSystem : ISystem
         var resolution = rand.NextInt2(new int2(5), new int2(20));
         var soldierCount = resolution.x * resolution.y;
 
-        var squadEntity = state.EntityManager.CreateEntity(_squadArchetype);
+        var squadEntity = state.EntityManager.CreateEntity(systemData.squadArchetype);
         state.EntityManager.GetBuffer<SoldierLink>(squadEntity).EnsureCapacity(soldierCount);
         state.EntityManager.SetComponentData(squadEntity, new SquadSettings
         {

@@ -9,11 +9,16 @@ using Unity.Mathematics;
 
 namespace NSprites
 {
-    // TODO: try to get rid of managed things in 1.0 entities and make system burstable ISystem
+    [BurstCompile]
     [WorldSystemFilter(WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor)]
-    public partial class SpriteSortingSystem : SystemBase
+    public partial struct SpriteSortingSystem : ISystem
     {
         #region data
+        private struct SystemData : IComponentData
+        {
+            public EntityQuery sortingSpritesQuery;
+            public EntityQuery sortingStaticSpritesQuery;
+        }
         internal struct SortingData
         {
             internal struct GeneralComparer : IComparer<SortingData>
@@ -121,80 +126,8 @@ namespace NSprites
 
         private const int LayerCount = 8;
         private const float PerLayerOffset = 1f / LayerCount;
-        private EntityQuery _sortingSpritesQuery;
-        private EntityQuery _sortingStaticSpritesQuery;
-        private List<SortingLayer> _sortingLayers;
 
-        protected override void OnCreate()
-        {
-            base.OnCreate();
-            _sortingSpritesQuery = GetEntityQuery
-            (
-                ComponentType.Exclude<CullSpriteTag>(),
-
-                ComponentType.ReadOnly<WorldPosition2D>(),
-
-                ComponentType.ReadOnly<SortingValue>(),
-                ComponentType.ReadOnly<SortingIndex>(),
-                ComponentType.ReadOnly<SortingLayer>(),
-                ComponentType.ReadOnly<VisualSortingTag>(),
-                ComponentType.Exclude<SortingStaticTag>()
-            );
-            _sortingStaticSpritesQuery = GetEntityQuery
-            (
-                ComponentType.Exclude<CullSpriteTag>(),
-
-                ComponentType.ReadOnly<WorldPosition2D>(),
-
-                ComponentType.ReadOnly<SortingValue>(),
-                ComponentType.ReadOnly<SortingIndex>(),
-                ComponentType.ReadOnly<SortingLayer>(),
-                ComponentType.ReadOnly<VisualSortingTag>(),
-                ComponentType.ReadOnly<SortingStaticTag>()
-            );
-
-            _sortingLayers = new List<SortingLayer>();
-        }
-
-        protected override void OnUpdate()
-        {
-            var sortingSpritesIsEmpty = _sortingSpritesQuery.IsEmpty;
-            _sortingSpritesQuery.AddOrderVersionFilter();
-            var sortingStaticSpritesIsEmpty = _sortingSpritesQuery.IsEmpty;
-            _sortingSpritesQuery.ResetFilter();
-
-            if (sortingSpritesIsEmpty && sortingStaticSpritesIsEmpty)
-                return;
-
-            _sortingLayers.Clear();
-            EntityManager.GetAllUniqueSharedComponentsManaged(_sortingLayers);
-            var bothModes = !sortingSpritesIsEmpty & !sortingSpritesIsEmpty;
-            var handles = new NativeArray<JobHandle>(_sortingLayers.Count * (bothModes ? 2 : 1), Allocator.Temp);
-            var staticHandlesOffset = bothModes ? _sortingLayers.Count : 0;
-
-            if (!sortingSpritesIsEmpty)
-            {
-                for (int i = 0; i < _sortingLayers.Count; i++)
-                {
-                    var sortingLayer = _sortingLayers[i];
-                    _sortingSpritesQuery.SetSharedComponentFilter(sortingLayer);
-                    handles[i] = RegularSort(_sortingSpritesQuery, sortingLayer.index);
-                }
-            }
-
-            if (!sortingStaticSpritesIsEmpty)
-            {
-                for (int i = 0; i < _sortingLayers.Count; i++)
-                {
-                    var sortingLayer = _sortingLayers[i];
-                    _sortingStaticSpritesQuery.SetSharedComponentFilter(sortingLayer);
-                    handles[staticHandlesOffset + i] = RegularSort(_sortingStaticSpritesQuery, sortingLayer.index);
-                }
-            }
-
-            Dependency = JobHandle.CombineDependencies(handles);
-        }
-        private JobHandle RegularSort(in EntityQuery sortingQuery, int sortingLayer)
+        private JobHandle RegularSort(in EntityQuery sortingQuery, int sortingLayer, ref SystemState state)
         {
             var spriteEntitiesCount = sortingQuery.CalculateEntityCount();
 
@@ -211,15 +144,15 @@ namespace NSprites
 
             var gatherSortingDataJob = new GatherSortingDataJob
             {
-                entityTypeHandle = GetEntityTypeHandle(),
-                worldPosition2D_CTH = GetComponentTypeHandle<WorldPosition2D>(true),
-                worldPosition2D_CDFE = GetComponentLookup<WorldPosition2D>(true),
-                sortingIndex_CTH = GetComponentTypeHandle<SortingIndex>(true),
+                entityTypeHandle = SystemAPI.GetEntityTypeHandle(),
+                worldPosition2D_CTH = SystemAPI.GetComponentTypeHandle<WorldPosition2D>(true),
+                worldPosition2D_CDFE = SystemAPI.GetComponentLookup<WorldPosition2D>(true),
+                sortingIndex_CTH = SystemAPI.GetComponentTypeHandle<SortingIndex>(true),
                 pointers = dataPointers,
                 sortingDataArray = sortingDataArray,
                 chunkBasedEntityIndeces = chunkBaseEntityIndeces
             };
-            var gatherSortingDataHandle = gatherSortingDataJob.ScheduleParallelByRef(sortingQuery, JobHandle.CombineDependencies(calculateChunkBaseEntityIndeces, Dependency));
+            var gatherSortingDataHandle = gatherSortingDataJob.ScheduleParallelByRef(sortingQuery, JobHandle.CombineDependencies(calculateChunkBaseEntityIndeces, state.Dependency));
 
             // after sorting dataPointers get sorted while sortingDataArray stay the same
             var sortHandle = new SortArrayJob<int, SortingDataComparer>
@@ -246,7 +179,7 @@ namespace NSprites
             var writeBackChunkDataJob = new WriteSortingValuesToChunksJob
             {
                 sortingValues = sortingValues,
-                sortingValue_CTH_WO = GetComponentTypeHandle<SortingValue>(false),
+                sortingValue_CTH_WO = SystemAPI.GetComponentTypeHandle<SortingValue>(false),
                 chunkBasedEntityIndeces = chunkBaseEntityIndeces
             };
             var writeBackChunkDataHandle = writeBackChunkDataJob.ScheduleParallelByRef(sortingQuery, genSortingValuesJob);
@@ -255,6 +188,80 @@ namespace NSprites
             _ = sortingValues.Dispose(writeBackChunkDataHandle);
 
             return writeBackChunkDataHandle;
+        }
+
+        public void OnCreate(ref SystemState state)
+        {
+            var systemData = new SystemData();
+            systemData.sortingSpritesQuery = state.GetEntityQuery
+            (
+                ComponentType.Exclude<CullSpriteTag>(),
+
+                ComponentType.ReadOnly<WorldPosition2D>(),
+
+                ComponentType.ReadOnly<SortingValue>(),
+                ComponentType.ReadOnly<SortingIndex>(),
+                ComponentType.ReadOnly<SortingLayer>(),
+                ComponentType.ReadOnly<VisualSortingTag>(),
+                ComponentType.Exclude<SortingStaticTag>()
+            );
+            systemData.sortingStaticSpritesQuery = state.GetEntityQuery
+            (
+                ComponentType.Exclude<CullSpriteTag>(),
+
+                ComponentType.ReadOnly<WorldPosition2D>(),
+
+                ComponentType.ReadOnly<SortingValue>(),
+                ComponentType.ReadOnly<SortingIndex>(),
+                ComponentType.ReadOnly<SortingLayer>(),
+                ComponentType.ReadOnly<VisualSortingTag>(),
+                ComponentType.ReadOnly<SortingStaticTag>()
+            );
+            state.EntityManager.AddComponentData(state.SystemHandle, systemData);
+        }
+
+        public void OnDestroy(ref SystemState state)
+        {
+        }
+
+        public void OnUpdate(ref SystemState state)
+        {
+
+            var systemData = SystemAPI.GetComponent<SystemData>(state.SystemHandle);
+            var sortingSpritesIsEmpty = systemData.sortingSpritesQuery.IsEmpty;
+            systemData.sortingSpritesQuery.AddOrderVersionFilter();
+            var sortingStaticSpritesIsEmpty = systemData.sortingSpritesQuery.IsEmpty;
+            systemData.sortingSpritesQuery.ResetFilter();
+
+            if (sortingSpritesIsEmpty && sortingStaticSpritesIsEmpty)
+                return;
+
+            state.EntityManager.GetAllUniqueSharedComponents<SortingLayer>(out var sortingLayers, Allocator.Temp);
+            var bothModes = !sortingSpritesIsEmpty & !sortingSpritesIsEmpty;
+            var handles = new NativeArray<JobHandle>(sortingLayers.Length * (bothModes ? 2 : 1), Allocator.Temp);
+            var staticHandlesOffset = bothModes ? sortingLayers.Length : 0;
+
+            if (!sortingSpritesIsEmpty)
+            {
+                for (int i = 0; i < sortingLayers.Length; i++)
+                {
+                    var sortingLayer = sortingLayers[i];
+                    systemData.sortingSpritesQuery.SetSharedComponentFilter(sortingLayer);
+                    handles[i] = RegularSort(systemData.sortingSpritesQuery, sortingLayer.index, ref state);
+                }
+            }
+
+            if (!sortingStaticSpritesIsEmpty)
+            {
+                for (int i = 0; i < sortingLayers.Length; i++)
+                {
+                    var sortingLayer = sortingLayers[i];
+                    systemData.sortingStaticSpritesQuery.SetSharedComponentFilter(sortingLayer);
+                    handles[staticHandlesOffset + i] = RegularSort(systemData.sortingStaticSpritesQuery, sortingLayer.index, ref state);
+                }
+            }
+
+            state.Dependency = JobHandle.CombineDependencies(handles);
         }
     }
 }

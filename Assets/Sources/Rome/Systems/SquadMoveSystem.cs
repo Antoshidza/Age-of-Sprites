@@ -71,13 +71,19 @@ public partial struct SquadMoveSystem : ISystem
             MoveJob.MoveSoldiers(squadSettings, squadDefaultSettings.soldierSize, soldiersBuffer, pos.value, ref destination_CL);
         }
     }
-
-    private SquadDefaultSettings _prevSquadSettings;
-    private EntityQuery _squadQuery;
+    private struct SystemData : IComponentData
+    {
+        public SquadDefaultSettings prevSquadSettings;
+        public EntityQuery squadQuery;
+    }
 
     public void OnCreate(ref SystemState state)
     {
-        _squadQuery = state.GetEntityQuery(typeof(SoldierLink));
+        var systemData = new SystemData
+        {
+            squadQuery = state.GetEntityQuery(typeof(SoldierLink))
+        };
+        _ = state.EntityManager.AddComponentData(state.SystemHandle, systemData);
     }
 
     public void OnDestroy(ref SystemState state)
@@ -89,9 +95,11 @@ public partial struct SquadMoveSystem : ISystem
         if (!SystemAPI.TryGetSingleton<SquadDefaultSettings>(out var squadDefaultSettings))
             return;
 
-        if (_prevSquadSettings != squadDefaultSettings)
+        var systemData = SystemAPI.GetComponent<SystemData>(state.SystemHandle);
+
+        if (systemData.prevSquadSettings != squadDefaultSettings)
         {
-            _prevSquadSettings = squadDefaultSettings;
+            systemData.prevSquadSettings = squadDefaultSettings;
 
             var moveOnSettingChangeJob = new MoveOnChangeGlobalSettingsJob
             {
@@ -112,7 +120,7 @@ public partial struct SquadMoveSystem : ISystem
                 prevPos_CTH_RW = SystemAPI.GetComponentTypeHandle<PrevWorldPosition2D>(false),
                 soldierLink_BTH_RO = SystemAPI.GetBufferTypeHandle<SoldierLink>(true)
             };
-            state.Dependency = moveJob.ScheduleParallelByRef(_squadQuery, state.Dependency);
+            state.Dependency = moveJob.ScheduleParallelByRef(systemData.squadQuery, state.Dependency);
         }
     }
 }
