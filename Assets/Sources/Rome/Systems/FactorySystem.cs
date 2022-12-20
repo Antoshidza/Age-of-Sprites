@@ -37,7 +37,7 @@ public partial struct FactorySystem : ISystem
     public void OnDestroy(ref SystemState state)
     {
     }
-
+    [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         var productionJob = new ProductionJob

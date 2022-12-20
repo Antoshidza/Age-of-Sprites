@@ -63,7 +63,7 @@ namespace NSprites
         public void OnDestroy(ref SystemState state)
         {
         }
-
+        [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
             var animationJob = new AnimationJob { time = SystemAPI.Time.ElapsedTime };

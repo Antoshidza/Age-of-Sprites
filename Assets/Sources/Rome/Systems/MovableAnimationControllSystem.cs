@@ -1,5 +1,6 @@
 ﻿using NSprites;
 using Unity.Burst;
+using Unity.Collections;
 using Unity.Entities;
 
 #pragma warning disable CS0282 // I guess because of DOTS's codegen
@@ -41,60 +42,59 @@ public partial struct MovableAnimationControllSystem : ISystem
         public EntityQuery gotUnderWayQuery;
         public EntityQuery stopedQuery;
     }
-
+    [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
         var systemData = new SystemData();
-        var gotUnderWayQuery = state.GetEntityQuery
-        (
-            ComponentType.Exclude<CullSpriteTag>(),
-
-            ComponentType.ReadWrite<AnimationIndex>(),
-            ComponentType.ReadWrite<AnimationTimer>(),
-            ComponentType.ReadWrite<FrameIndex>(),
-            ComponentType.ReadOnly<AnimationSetLink>(),
-
-            ComponentType.ReadOnly<Destination>(),
-            ComponentType.ReadOnly<MoveTimer>()
-        );
+        var queryBuilder = new EntityQueryBuilder(Allocator.Temp)
+            .WithNone<CullSpriteTag>()
+            .WithAll<AnimationIndex>()
+            .WithAll<AnimationTimer>()
+            .WithAll<FrameIndex>()
+            .WithAll<AnimationSetLink>()
+            .WithAll<Destination>()
+            .WithAll<MoveTimer>();
+        var gotUnderWayQuery = state.GetEntityQuery(queryBuilder);
         gotUnderWayQuery.AddOrderVersionFilter();
         systemData.gotUnderWayQuery = gotUnderWayQuery;
-        var stopedQuery = state.GetEntityQuery
-        (
-            ComponentType.Exclude<CullSpriteTag>(),
 
-            ComponentType.ReadWrite<AnimationIndex>(),
-            ComponentType.ReadWrite<AnimationTimer>(),
-            ComponentType.ReadWrite<FrameIndex>(),
-            ComponentType.ReadOnly<AnimationSetLink>(),
-
-            ComponentType.ReadOnly<Destination>(),
-            ComponentType.Exclude<MoveTimer>()
-        );
+        queryBuilder.Reset();
+        _ = queryBuilder.WithNone<CullSpriteTag>()
+            .WithAll<AnimationIndex>()
+            .WithAll<AnimationTimer>()
+            .WithAll<FrameIndex>()
+            .WithAll<AnimationSetLink>()
+            .WithAll<Destination>()
+            .WithNone<MoveTimer>();
+        var stopedQuery = state.GetEntityQuery(queryBuilder);
         stopedQuery.AddOrderVersionFilter();
         systemData.stopedQuery = stopedQuery;
+
         _ = state.EntityManager.AddComponentData(state.SystemHandle, systemData);
+
+        queryBuilder.Dispose();
     }
 
     public void OnDestroy(ref SystemState state)
     {
     }
-
+    [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         var systemData = SystemAPI.GetComponent<SystemData>(state.SystemHandle);
+        var animationSettings = SystemAPI.GetSingleton<AnimationSettings>();
         var time = SystemAPI.Time.ElapsedTime;
 
         var gotUnderWayChangeAnimationJob = new ChangeAnimation
         {
-            setToAnimationID = CharacterAnimations.Walk,
+            setToAnimationID = animationSettings.WalkHash,
             time = time
         };
         state.Dependency = gotUnderWayChangeAnimationJob.ScheduleParallelByRef(systemData.gotUnderWayQuery, state.Dependency);
 
         var stopedChangeAnimationJob = new ChangeAnimation
         {
-            setToAnimationID = CharacterAnimations.Idle,
+            setToAnimationID = animationSettings.IdleHash,
             time = time
         };
         state.Dependency = stopedChangeAnimationJob.ScheduleParallel(systemData.stopedQuery, state.Dependency);

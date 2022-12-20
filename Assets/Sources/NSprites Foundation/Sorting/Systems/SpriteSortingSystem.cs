@@ -190,40 +190,39 @@ namespace NSprites
             return writeBackChunkDataHandle;
         }
 
+        [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
             var systemData = new SystemData();
-            systemData.sortingSpritesQuery = state.GetEntityQuery
-            (
-                ComponentType.Exclude<CullSpriteTag>(),
+            var queryBuilder = new EntityQueryBuilder(Allocator.Temp)
+                .WithNone<CullSpriteTag>()
+                .WithAll<WorldPosition2D>()
+                .WithAll<SortingValue>()
+                .WithAll<SortingIndex>()
+                .WithAll<SortingLayer>()
+                .WithAll<VisualSortingTag>()
+                .WithNone<SortingStaticTag>();
+            systemData.sortingSpritesQuery = state.GetEntityQuery(queryBuilder);
 
-                ComponentType.ReadOnly<WorldPosition2D>(),
+            queryBuilder.Reset();
+            _ = queryBuilder.WithNone<CullSpriteTag>()
+                .WithAll<WorldPosition2D>()
+                .WithAll<SortingValue>()
+                .WithAll<SortingIndex>()
+                .WithAll<SortingLayer>()
+                .WithAll<VisualSortingTag>()
+                .WithAll<SortingStaticTag>();
+            systemData.sortingStaticSpritesQuery = state.GetEntityQuery(queryBuilder);
 
-                ComponentType.ReadOnly<SortingValue>(),
-                ComponentType.ReadOnly<SortingIndex>(),
-                ComponentType.ReadOnly<SortingLayer>(),
-                ComponentType.ReadOnly<VisualSortingTag>(),
-                ComponentType.Exclude<SortingStaticTag>()
-            );
-            systemData.sortingStaticSpritesQuery = state.GetEntityQuery
-            (
-                ComponentType.Exclude<CullSpriteTag>(),
+            _ = state.EntityManager.AddComponentData(state.SystemHandle, systemData);
 
-                ComponentType.ReadOnly<WorldPosition2D>(),
-
-                ComponentType.ReadOnly<SortingValue>(),
-                ComponentType.ReadOnly<SortingIndex>(),
-                ComponentType.ReadOnly<SortingLayer>(),
-                ComponentType.ReadOnly<VisualSortingTag>(),
-                ComponentType.ReadOnly<SortingStaticTag>()
-            );
-            state.EntityManager.AddComponentData(state.SystemHandle, systemData);
+            queryBuilder.Dispose();
         }
 
         public void OnDestroy(ref SystemState state)
         {
         }
-
+        [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
 

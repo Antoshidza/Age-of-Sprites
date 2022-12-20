@@ -12,7 +12,7 @@ public partial struct SpawnSoliderSystem : ISystem
     public void OnDestroy(ref SystemState state)
     {
     }
-
+    [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         if (!Input.GetKey(KeyCode.A))

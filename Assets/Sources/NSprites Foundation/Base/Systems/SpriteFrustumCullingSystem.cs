@@ -2,7 +2,6 @@
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEditor;
-using UnityEngine;
 
 namespace NSprites
 {
@@ -39,11 +38,9 @@ namespace NSprites
                     ecb.RemoveComponent<CullSpriteTag>(chunkIndex, entity);
             }
         }
-        private class SystemData : IComponentData
+        public struct SystemData : IComponentData
         {
-            private Camera _camera;
-
-            public Camera Camera => _camera == null ? Camera.main : _camera;
+            public float4 cullingBoudns;
         }
 
 #if UNITY_EDITOR
@@ -83,35 +80,31 @@ namespace NSprites
                 IsInsideCameraBounds(new float2(rect.y, rect.z), cameraViewBounds) ||
                 IsInsideCameraBounds(new float2(rect.y, rect.w), cameraViewBounds);
         }
-
+        [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            state.EntityManager.AddComponentObject(state.SystemHandle, new SystemData());
+            _ = state.EntityManager.AddComponentData(state.SystemHandle, new SystemData());
         }
 
         public void OnDestroy(ref SystemState state)
         {
         }
-
+        [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            var systemData = state.EntityManager.GetComponentObject<SystemData>(state.SystemHandle);
             var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
-
-            var leftBottomPoint = systemData.Camera.ScreenToWorldPoint(new Vector3(0f, 0f, 0f));
-            var rightUpPoint = systemData.Camera.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, 0f));
-            var cameraViewBounds = new float4(leftBottomPoint.x, rightUpPoint.x, leftBottomPoint.y, rightUpPoint.y);
+            var cullingBounds = SystemAPI.GetComponent<SystemData>(state.SystemHandle).cullingBoudns;
 
             var disableCulledJob = new DisableCulledJob
             {
-                cameraViewBounds = cameraViewBounds,
+                cameraViewBounds = cullingBounds,
                 ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter()
             };
             state.Dependency =  disableCulledJob.ScheduleParallelByRef(state.Dependency);
 
             var enableUnculledJob = new EnableUnculledJob
             {
-                cameraViewBounds = cameraViewBounds,
+                cameraViewBounds = cullingBounds,
                 ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter()
             };
             state.Dependency = enableUnculledJob.ScheduleParallelByRef(state.Dependency);

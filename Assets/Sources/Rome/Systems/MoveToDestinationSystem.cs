@@ -80,22 +80,24 @@ public partial struct MoveToDestinationSystem : ISystem
         public EntityQuery movableQuery;
     }
 
+    [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
-        var systemData = new SystemData();
-        systemData.movableQuery = state.GetEntityQuery
-        (
-            ComponentType.ReadOnly<MoveSpeed>(),
-            ComponentType.ReadOnly<WorldPosition2D>(),
-            ComponentType.ReadOnly<Destination>()
-        );
+        var queryBuilder = new EntityQueryBuilder(Allocator.Temp)
+            .WithAll<MoveSpeed>()
+            .WithAll<WorldPosition2D>()
+            .WithAll<Destination>();
+        var systemData = new SystemData{ movableQuery = state.GetEntityQuery(queryBuilder) };
         _ = state.EntityManager.AddComponentData(state.SystemHandle, systemData);
+
+        queryBuilder.Dispose();
     }
 
     public void OnDestroy(ref SystemState state)
     {
     }
 
+    [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         var systemData = SystemAPI.GetComponent<SystemData>(state.SystemHandle);

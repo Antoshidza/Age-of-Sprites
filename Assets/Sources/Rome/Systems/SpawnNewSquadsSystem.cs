@@ -13,6 +13,7 @@ public partial struct SpawnNewSquadsSystem : ISystem
     {
         public EntityQuery soldierRequireQuery;
         public EntityArchetype squadArchetype;
+        public Random rand;
     }
 
     public void OnCreate(ref SystemState state)
@@ -28,7 +29,8 @@ public partial struct SpawnNewSquadsSystem : ISystem
 
                 typeof(WorldPosition2D),
                 typeof(PrevWorldPosition2D)
-            )
+            ),
+            rand = new Random((uint)System.DateTime.Now.Ticks)
         };
         _ = state.EntityManager.AddComponentData(state.SystemHandle, systemData);
     }
@@ -36,7 +38,7 @@ public partial struct SpawnNewSquadsSystem : ISystem
     public void OnDestroy(ref SystemState state)
     {
     }
-
+    [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         var systemData = SystemAPI.GetComponent<SystemData>(state.SystemHandle);
@@ -45,9 +47,8 @@ public partial struct SpawnNewSquadsSystem : ISystem
             || !SystemAPI.TryGetSingleton<SquadDefaultSettings>(out var squadDefaultSettings))
             return;
 
-        var rand = new Random((uint)System.DateTime.Now.Ticks);
-        var pos = rand.NextFloat2(mapSettings.size.c0, mapSettings.size.c1);
-        var resolution = rand.NextInt2(new int2(5), new int2(20));
+        var pos = systemData.rand.NextFloat2(mapSettings.size.c0, mapSettings.size.c1);
+        var resolution = systemData.rand.NextInt2(new int2(5), new int2(20));
         var soldierCount = resolution.x * resolution.y;
 
         var squadEntity = state.EntityManager.CreateEntity(systemData.squadArchetype);
@@ -60,5 +61,7 @@ public partial struct SpawnNewSquadsSystem : ISystem
         state.EntityManager.SetComponentData(squadEntity, new RequireSoldier { count = soldierCount });
         state.EntityManager.SetComponentData(squadEntity, new WorldPosition2D { value = pos });
         state.EntityManager.SetComponentData(squadEntity, new PrevWorldPosition2D { value = pos });
+
+        SystemAPI.SetComponent(state.SystemHandle, systemData);
     }
 }

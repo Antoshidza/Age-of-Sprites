@@ -67,22 +67,30 @@ public partial struct SoldierDistributionSystem : ISystem
         public EntityQuery freeSoldiersQuery;
     }
 
+    [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
         var systemData = new SystemData();
-        systemData.soldierLessSquadQuery = state.GetEntityQuery(typeof(RequireSoldier));
-        systemData.freeSoldiersQuery = state.GetEntityQuery
-        (
-            ComponentType.ReadOnly<SoldierTag>(),
-            ComponentType.Exclude<InSquadSoldierTag>()
-        );
-        state.EntityManager.AddComponentData(state.SystemHandle, systemData);
+
+        var queryBuilder = new EntityQueryBuilder(Allocator.Temp)
+            .WithAll<RequireSoldier>();
+        systemData.soldierLessSquadQuery = state.GetEntityQuery(queryBuilder);
+
+        queryBuilder.Reset();
+        _ = queryBuilder
+            .WithAll<SoldierTag>()
+            .WithNone<InSquadSoldierTag>();
+        systemData.freeSoldiersQuery = state.GetEntityQuery(queryBuilder);
+
+        _ = state.EntityManager.AddComponentData(state.SystemHandle, systemData);
+
+        queryBuilder.Dispose();
     }
 
     public void OnDestroy(ref SystemState state)
     {
     }
-
+    [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         var systemData = SystemAPI.GetComponent<SystemData>(state.SystemHandle);

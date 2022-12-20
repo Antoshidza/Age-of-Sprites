@@ -30,24 +30,29 @@ public partial struct GenerateMapSystem : ISystem
             }
         }
     }
+    private struct SystemData : IComponentData
+    {
+        public Random rand;
+    }
 
     public void OnCreate(ref SystemState state)
     {
+        _ = state.EntityManager.AddComponentData(state.SystemHandle, new SystemData { rand = new Random((uint)System.DateTime.Now.Ticks) });
     }
 
     public void OnDestroy(ref SystemState state)
     {
     }
-
+    [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         if (!SystemAPI.TryGetSingleton<MapSettings>(out var mapSettings))
             return;
 
-        var rand = new Random((uint)System.DateTime.Now.Ticks);
+        var systemData = SystemAPI.GetComponent<SystemData>(state.SystemHandle);
         var posRands = new NativeArray<Random>(JobsUtility.MaxJobThreadCount, Allocator.TempJob);
         for (int i = 0; i < posRands.Length; i++)
-            posRands[i] = new Random(rand.NextUInt());
+            posRands[i] = new Random(systemData.rand.NextUInt());
 
         var generateMapJob = new GenerateMapJob
         {
@@ -58,6 +63,8 @@ public partial struct GenerateMapSystem : ISystem
         };
         state.Dependency = generateMapJob.ScheduleBatch(mapSettings.rockCount, 32, state.Dependency);
         _ = posRands.Dispose(state.Dependency);
+
+        SystemAPI.SetComponent(state.SystemHandle, systemData);
 
         state.Enabled = false;
     }

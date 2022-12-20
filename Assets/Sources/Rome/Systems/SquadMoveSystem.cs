@@ -76,20 +76,21 @@ public partial struct SquadMoveSystem : ISystem
         public SquadDefaultSettings prevSquadSettings;
         public EntityQuery squadQuery;
     }
-
+    [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
-        var systemData = new SystemData
-        {
-            squadQuery = state.GetEntityQuery(typeof(SoldierLink))
-        };
-        _ = state.EntityManager.AddComponentData(state.SystemHandle, systemData);
+        var queryBuilder = new EntityQueryBuilder(Allocator.Temp)
+            .WithAll<SoldierLink>();
+
+        _ = state.EntityManager.AddComponentData(state.SystemHandle, new SystemData { squadQuery = state.GetEntityQuery(queryBuilder) });
+
+        queryBuilder.Dispose();
     }
 
     public void OnDestroy(ref SystemState state)
     {
     }
-
+    [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         if (!SystemAPI.TryGetSingleton<SquadDefaultSettings>(out var squadDefaultSettings))
