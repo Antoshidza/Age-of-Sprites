@@ -37,16 +37,16 @@ public partial struct MoveToDestinationSystem : ISystem
                 var destionations = chunk.GetNativeArray(ref destionation_CTH_RO);
                 var timers = chunk.GetNativeArray(ref moveTimer_CTH_RW);
 
-                if (chunk.Has(ref moveTimer_CTH_RW))
-                    for (int entityIndex = 0; entityIndex < worldPositions.Length; entityIndex++)
-                        timers[entityIndex] = new MoveTimer { remainingTime = GetRamainingTime(worldPositions[entityIndex].value, destionations[entityIndex].value, moveSpeeds[entityIndex].value) };
-                else
-                    for (int entityIndex = 0; entityIndex < worldPositions.Length; entityIndex++)
+                for (int entityIndex = 0; entityIndex < entities.Length; entityIndex++)
+                {
+                    var distance = math.length(destionations[entityIndex].value - worldPositions[entityIndex].value);
+                    if (distance > threshold)
                     {
-                        var distance = math.length(destionations[entityIndex].value - worldPositions[entityIndex].value);
-                        if (distance > threshold)
-                            ecb.AddComponent(unfilteredChunkIndex, entities[entityIndex], new MoveTimer { remainingTime = GetRamainingTime(distance, moveSpeeds[entityIndex].value) });
+                        timers[entityIndex] = new MoveTimer { remainingTime = GetRamainingTime(distance, moveSpeeds[entityIndex].value) };
+                        if (!chunk.IsComponentEnabled(ref moveTimer_CTH_RW, entityIndex))
+                            ecb.SetComponentEnabled<MoveTimer>(unfilteredChunkIndex, entities[entityIndex], true);
                     }
+                }
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -70,7 +70,7 @@ public partial struct MoveToDestinationSystem : ISystem
             timer.remainingTime = math.max(0, timer.remainingTime - deltaTime);
 
             if (timer.remainingTime == 0f)
-                ecb.RemoveComponent<MoveTimer>(chunkIndex, entity);
+                ecb.SetComponentEnabled<MoveTimer>(chunkIndex, entity, false);
         }
     }
     #endregion

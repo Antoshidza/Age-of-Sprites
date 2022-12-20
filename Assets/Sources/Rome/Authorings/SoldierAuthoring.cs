@@ -9,6 +9,7 @@ public class SoldierAuthoring : MonoBehaviour
         {
             AddComponent<SoldierTag>();
             AddComponent<Destination>();
+            AddComponent<MoveTimer>();
             AddComponent(new MoveSpeed { value = authoring.MoveSpeed });
         }
     }
