@@ -82,7 +82,8 @@ public partial struct MovableAnimationControllSystem : ISystem
     public void OnUpdate(ref SystemState state)
     {
         var systemData = SystemAPI.GetComponent<SystemData>(state.SystemHandle);
-        var animationSettings = SystemAPI.GetSingleton<AnimationSettings>();
+        if (!SystemAPI.TryGetSingleton<AnimationSettings>(out var animationSettings))
+            return;
         var time = SystemAPI.Time.ElapsedTime;
 
         var gotUnderWayChangeAnimationJob = new ChangeAnimation
