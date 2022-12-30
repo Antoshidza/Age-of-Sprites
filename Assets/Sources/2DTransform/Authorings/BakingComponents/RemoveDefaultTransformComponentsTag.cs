@@ -5,7 +5,7 @@ namespace NSprites
     /// <summary>
     /// Use this component during baking process to trigger it to remove default Unity.Transforms components
     /// </summary>
-    [TemporaryBakingType]
+    [BakingType]
     public struct RemoveDefaultTransformComponentsTag : IComponentData
     {
     }

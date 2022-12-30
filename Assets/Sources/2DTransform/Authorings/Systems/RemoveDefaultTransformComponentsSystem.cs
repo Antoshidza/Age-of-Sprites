@@ -12,7 +12,7 @@ namespace NSprites
             private EntityQuery query;
 
             public void Initialize(ref SystemState state)
-                => query = state.GetEntityQuery(new EntityQueryDesc() { All = new ComponentType[] { typeof(T) }, Options = EntityQueryOptions.IncludePrefab });
+                => query = state.GetEntityQuery(new EntityQueryDesc() { All = new ComponentType[] { typeof(T), typeof(RemoveDefaultTransformComponentsTag) }, Options = EntityQueryOptions.IncludePrefab });
             public void Perform(ref SystemState state)
                 => state.EntityManager.RemoveComponent<T>(query);
         }

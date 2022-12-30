@@ -33,7 +33,6 @@ namespace NSprites
                 var data = authoring._spriteRenderData;
                 if (authoring._overrideSpriteTexture)
                     data.Material = authoring.GetOrCreateOverridedMaterial(authoring._sprite.texture);
-                // TODO: use here WeakObjectReference instead of managed component
                 AddComponentObject(new SpriteRenderDataToRegistrate { data = data });
 
                 // prevent appearing default Unity.Transform components on entity

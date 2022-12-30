@@ -133,6 +133,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4586196}
   - component: {fileID: 4586193}
+  - component: {fileID: 4586197}
   m_Layer: 0
   m_Name: Squad (9)
   m_TagString: Untagged
@@ -173,6 +174,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 21
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4586197
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4586192}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c9a66927984aa940b7d772cbc8e4189, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &29667687
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -378,6 +391,7 @@ GameObject:
   m_Component:
   - component: {fileID: 63542695}
   - component: {fileID: 63542692}
+  - component: {fileID: 63542696}
   m_Layer: 0
   m_Name: Squad (13)
   m_TagString: Untagged
@@ -418,6 +432,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 25
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &63542696
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 63542691}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c9a66927984aa940b7d772cbc8e4189, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &86552363
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -818,6 +844,7 @@ GameObject:
   m_Component:
   - component: {fileID: 206884753}
   - component: {fileID: 206884750}
+  - component: {fileID: 206884754}
   m_Layer: 0
   m_Name: Squad (1)
   m_TagString: Untagged
@@ -858,6 +885,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 13
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &206884754
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 206884749}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c9a66927984aa940b7d772cbc8e4189, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &213897840
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1193,6 +1232,7 @@ GameObject:
   m_Component:
   - component: {fileID: 290350716}
   - component: {fileID: 290350713}
+  - component: {fileID: 290350717}
   m_Layer: 0
   m_Name: Squad (16)
   m_TagString: Untagged
@@ -1233,6 +1273,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 28
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &290350717
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 290350712}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c9a66927984aa940b7d772cbc8e4189, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &302259534
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1373,6 +1425,7 @@ GameObject:
   m_Component:
   - component: {fileID: 317889773}
   - component: {fileID: 317889770}
+  - component: {fileID: 317889774}
   m_Layer: 0
   m_Name: Squad (8)
   m_TagString: Untagged
@@ -1413,6 +1466,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 20
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &317889774
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 317889769}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c9a66927984aa940b7d772cbc8e4189, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &382573946
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1748,6 +1813,7 @@ GameObject:
   m_Component:
   - component: {fileID: 433428703}
   - component: {fileID: 433428700}
+  - component: {fileID: 433428704}
   m_Layer: 0
   m_Name: Squad (6)
   m_TagString: Untagged
@@ -1788,6 +1854,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 19
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &433428704
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 433428699}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c9a66927984aa940b7d772cbc8e4189, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &481568207
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2123,6 +2201,7 @@ GameObject:
   m_Component:
   - component: {fileID: 638508420}
   - component: {fileID: 638508419}
+  - component: {fileID: 638508421}
   m_Layer: 0
   m_Name: AnimationSettings
   m_TagString: Untagged
@@ -2157,6 +2236,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &638508421
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 638508418}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c9a66927984aa940b7d772cbc8e4189, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &720885005
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2232,6 +2323,7 @@ GameObject:
   m_Component:
   - component: {fileID: 735927465}
   - component: {fileID: 735927462}
+  - component: {fileID: 735927466}
   m_Layer: 0
   m_Name: Squad (5)
   m_TagString: Untagged
@@ -2272,6 +2364,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 17
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &735927466
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 735927461}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c9a66927984aa940b7d772cbc8e4189, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &760121571
 GameObject:
   m_ObjectHideFlags: 0
@@ -2282,6 +2386,7 @@ GameObject:
   m_Component:
   - component: {fileID: 760121575}
   - component: {fileID: 760121572}
+  - component: {fileID: 760121576}
   m_Layer: 0
   m_Name: Squad (4)
   m_TagString: Untagged
@@ -2322,6 +2427,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 16
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &760121576
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 760121571}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c9a66927984aa940b7d772cbc8e4189, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &767367436
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2462,6 +2579,7 @@ GameObject:
   m_Component:
   - component: {fileID: 807114836}
   - component: {fileID: 807114837}
+  - component: {fileID: 807114838}
   m_Layer: 0
   m_Name: SquadSettings
   m_TagString: Untagged
@@ -2506,6 +2624,18 @@ MonoBehaviour:
   SoldierMargin:
     x: -0.05
     y: -0.35
+--- !u!114 &807114838
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 807114833}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c9a66927984aa940b7d772cbc8e4189, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &853195784
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2646,6 +2776,7 @@ GameObject:
   m_Component:
   - component: {fileID: 880128898}
   - component: {fileID: 880128895}
+  - component: {fileID: 880128899}
   m_Layer: 0
   m_Name: Squad (2)
   m_TagString: Untagged
@@ -2686,6 +2817,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 14
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &880128899
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 880128894}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c9a66927984aa940b7d772cbc8e4189, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &882320589
 GameObject:
   m_ObjectHideFlags: 0
@@ -2696,6 +2839,7 @@ GameObject:
   m_Component:
   - component: {fileID: 882320593}
   - component: {fileID: 882320590}
+  - component: {fileID: 882320594}
   m_Layer: 0
   m_Name: Squad (15)
   m_TagString: Untagged
@@ -2736,6 +2880,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 27
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &882320594
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 882320589}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c9a66927984aa940b7d772cbc8e4189, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &892736384
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3851,6 +4007,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1208309332}
   - component: {fileID: 1208309329}
+  - component: {fileID: 1208309333}
   m_Layer: 0
   m_Name: Squad
   m_TagString: Untagged
@@ -3891,6 +4048,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1208309333
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1208309327}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c9a66927984aa940b7d772cbc8e4189, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1282643604
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4096,6 +4265,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1341004295}
   - component: {fileID: 1341004292}
+  - component: {fileID: 1341004296}
   m_Layer: 0
   m_Name: Squad (10)
   m_TagString: Untagged
@@ -4136,6 +4306,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 22
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1341004296
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1341004291}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c9a66927984aa940b7d772cbc8e4189, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1345043300
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4276,6 +4458,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1360244481}
   - component: {fileID: 1360244478}
+  - component: {fileID: 1360244482}
   m_Layer: 0
   m_Name: Squad (3)
   m_TagString: Untagged
@@ -4316,6 +4499,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 15
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1360244482
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1360244477}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c9a66927984aa940b7d772cbc8e4189, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1365289248
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4911,6 +5106,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1497231406}
   - component: {fileID: 1497231408}
+  - component: {fileID: 1497231409}
   m_Layer: 0
   m_Name: MapSettings
   m_TagString: Untagged
@@ -4972,6 +5168,18 @@ MonoBehaviour:
   - {fileID: 2987939090022453250, guid: ad7aaeb6c429a434e9e361184b9100ec, type: 3}
   - {fileID: 2987939090022453250, guid: 8f4463f8f9890c24bb1f2e4e5d0d4fb8, type: 3}
   - {fileID: 2987939090022453250, guid: a6977cc07ee00c04ea8e63a64842c771, type: 3}
+--- !u!114 &1497231409
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1497231402}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c9a66927984aa940b7d772cbc8e4189, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1500818101
 GameObject:
   m_ObjectHideFlags: 0
@@ -4982,6 +5190,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1500818105}
   - component: {fileID: 1500818102}
+  - component: {fileID: 1500818106}
   m_Layer: 0
   m_Name: Squad (7)
   m_TagString: Untagged
@@ -5022,6 +5231,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 18
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1500818106
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1500818101}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c9a66927984aa940b7d772cbc8e4189, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1505272256
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5357,6 +5578,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1641438728}
   - component: {fileID: 1641438725}
+  - component: {fileID: 1641438729}
   m_Layer: 0
   m_Name: Squad (12)
   m_TagString: Untagged
@@ -5397,6 +5619,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 24
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1641438729
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1641438724}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c9a66927984aa940b7d772cbc8e4189, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1645801206
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5992,6 +6226,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1827323843}
   - component: {fileID: 1827323840}
+  - component: {fileID: 1827323844}
   m_Layer: 0
   m_Name: Squad (11)
   m_TagString: Untagged
@@ -6032,6 +6267,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 23
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1827323844
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1827323839}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c9a66927984aa940b7d772cbc8e4189, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1840381494
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6497,6 +6744,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1960509362}
   - component: {fileID: 1960509359}
+  - component: {fileID: 1960509363}
   m_Layer: 0
   m_Name: Squad (14)
   m_TagString: Untagged
@@ -6537,6 +6785,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 26
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1960509363
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1960509358}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c9a66927984aa940b7d772cbc8e4189, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1984244398
 PrefabInstance:
   m_ObjectHideFlags: 0
