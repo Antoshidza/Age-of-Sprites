@@ -6,9 +6,8 @@ using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
-using static NSprites.SpriteSortingSystem;
 
-[assembly: RegisterGenericJobType(typeof(SortArrayJob<int, SortingDataComparer>))]
+[assembly: RegisterGenericJobType(typeof(NSprites.SpriteSortingSystem.SortArrayJob<int, NSprites.SpriteSortingSystem.SortingDataComparer>))]
 
 namespace NSprites
 {
@@ -87,7 +86,7 @@ namespace NSprites
         [BurstCompile]
         internal struct SortArrayJob<TElement, TComparer> : IJob
             where TElement : unmanaged
-            where TComparer : struct, IComparer<TElement>
+            where TComparer : unmanaged, IComparer<TElement>
         {
             public NativeArray<TElement> array;
             public TComparer comparer;
