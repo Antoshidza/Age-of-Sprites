@@ -37,6 +37,8 @@ namespace NSprites
 
                 // prevent appearing default Unity.Transform components on entity
                 AddComponent<RemoveDefaultTransformComponentsTag>();
+
+                _ = DependsOn(authoring.transform);
                 AddComponentObject(new Transform2DRequest { sourceGameObject = authoring.gameObject });
             }
         }
