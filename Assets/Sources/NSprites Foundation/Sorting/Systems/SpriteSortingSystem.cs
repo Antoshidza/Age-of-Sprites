@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using NSprites;
+using System.Collections.Generic;
 using Unity.Burst;
 using Unity.Burst.Intrinsics;
 using Unity.Collections;
@@ -7,7 +8,7 @@ using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
 
-[assembly: RegisterGenericJobType(typeof(NSprites.SpriteSortingSystem.SortArrayJob<int, NSprites.SpriteSortingSystem.SortingDataComparer>))]
+[assembly: RegisterGenericJobType(typeof(SpriteSortingSystem.SortArrayJob<int, SpriteSortingSystem.SortingDataComparer>))]
 
 namespace NSprites
 {
@@ -124,6 +125,18 @@ namespace NSprites
                 NativeArray<SortingValue>.Copy(sortingValues, chunkBasedEntityIndeces[unfilteredChunkIndex], chunkSortingValues, 0, chunkSortingValues.Length);
             }
         }
+        [BurstCompile]
+        internal struct DisposeArray<TElement> : IJob
+            where TElement : unmanaged
+        {
+            [ReadOnly]
+            [NativeDisableParallelForRestriction]
+            [NativeDisableContainerSafetyRestriction]
+            [DeallocateOnJobCompletion]
+            public NativeArray<TElement> array;
+
+            public void Execute() {}
+        }
         #endregion
 
         private const int LayerCount = 8;
@@ -167,7 +180,8 @@ namespace NSprites
                 }
             }.Schedule(gatherSortingDataHandle);
 
-            _ = sortingDataArray.Dispose(sortHandle);
+            _ = new DisposeArray<SortingData> { array = sortingDataArray }.Schedule(sortHandle);
+            //_ = sortingDataArray.Dispose(sortHandle);
 
             var genSortingValuesJob = new GenerateSortingValuesJob
             {
@@ -176,7 +190,8 @@ namespace NSprites
                 pointers = dataPointers,
             }.ScheduleBatch(sortingValues.Length, 32, sortHandle);
 
-            _ = dataPointers.Dispose(genSortingValuesJob);
+            //_ = dataPointers.Dispose(genSortingValuesJob);
+            _ = new DisposeArray<int> { array = dataPointers }.Schedule(genSortingValuesJob);
 
             var writeBackChunkDataJob = new WriteSortingValuesToChunksJob
             {
@@ -186,8 +201,10 @@ namespace NSprites
             };
             var writeBackChunkDataHandle = writeBackChunkDataJob.ScheduleParallelByRef(sortingQuery, genSortingValuesJob);
 
-            _ = chunkBaseEntityIndeces.Dispose(writeBackChunkDataHandle);
-            _ = sortingValues.Dispose(writeBackChunkDataHandle);
+            //_ = chunkBaseEntityIndeces.Dispose(writeBackChunkDataHandle);
+            //_ = sortingValues.Dispose(writeBackChunkDataHandle);
+            _ = new DisposeArray<int> { array = chunkBaseEntityIndeces }.Schedule(writeBackChunkDataHandle);
+            _ = new DisposeArray<SortingValue> { array = sortingValues }.Schedule(writeBackChunkDataHandle);
 
             return writeBackChunkDataHandle;
         }
