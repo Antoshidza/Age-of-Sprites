@@ -7,7 +7,6 @@ namespace NSprites
     [WorldSystemFilter(WorldSystemFilterFlags.Editor | WorldSystemFilterFlags.Default)]
     public partial class RegisterRenderersSystem : SystemBase
     {
-        private SpriteRenderingSystem _spriteRenderingSystem;
         private EntityQuery _renderArchetypeToRegistrateQuery;
         private EntityQuery _renderArchetypeIndexLessEntitiesQuery;
         private HashSet<int> _registeredIDsSet = new();
@@ -15,7 +14,6 @@ namespace NSprites
         protected override void OnCreate()
         {
             base.OnCreate();
-            _spriteRenderingSystem = World.GetOrCreateSystemManaged<SpriteRenderingSystem>();
             _renderArchetypeToRegistrateQuery = GetEntityQuery
             (
                 new EntityQueryDesc
@@ -50,6 +48,9 @@ namespace NSprites
 
             void Registrate(in NativeArray<Entity> entities)
             {
+                if (!SystemAPI.ManagedAPI.TryGetSingleton<RenderArchetypeStorage>(out var renderArchetypeStorage))
+                    return;
+
                 for(int i = 0; i < entities.Length; i++)
                 {
                     var entity = entities[i];
@@ -57,7 +58,7 @@ namespace NSprites
 
                     if (!_registeredIDsSet.Contains(renderData.data.ID))
                     {
-                        _spriteRenderingSystem.RegisterRender
+                        renderArchetypeStorage.RegisterRender
                         (
                             renderData.data.ID,
                             renderData.data.Material,
