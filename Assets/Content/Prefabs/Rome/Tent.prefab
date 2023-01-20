@@ -49,6 +49,7 @@ MonoBehaviour:
   _spriteRenderData:
     Material: {fileID: 2100000, guid: d84d30a8fe326be4f98378dcb774dabf, type: 2}
     PropertiesSet: {fileID: 11400000, guid: 99d3374c56bc41b408704563b4c0e25e, type: 2}
+    fixNullRefSO_1: {fileID: 0}
   scale:
     x: 1
     y: 1
@@ -109,6 +110,7 @@ MonoBehaviour:
   _spriteRenderData:
     Material: {fileID: 2100000, guid: d84d30a8fe326be4f98378dcb774dabf, type: 2}
     PropertiesSet: {fileID: 11400000, guid: 99d3374c56bc41b408704563b4c0e25e, type: 2}
+    fixNullRefSO_1: {fileID: 0}
   scale:
     x: 1
     y: 1
@@ -172,6 +174,7 @@ MonoBehaviour:
   _spriteRenderData:
     Material: {fileID: 2100000, guid: d84d30a8fe326be4f98378dcb774dabf, type: 2}
     PropertiesSet: {fileID: 11400000, guid: 99d3374c56bc41b408704563b4c0e25e, type: 2}
+    fixNullRefSO_1: {fileID: 11400000, guid: e4eb27f6ecb5c234bb5bd74249c0b5ea, type: 2}
   scale:
     x: 1
     y: 1

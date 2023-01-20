@@ -48,8 +48,9 @@ MonoBehaviour:
   ExcludeUnityTransformComponents: 1
   _sprite: {fileID: 21300000, guid: c3a33f1d69974a64fbfb5c30407cf7f2, type: 3}
   _spriteRenderData:
-    Material: {fileID: 2100000, guid: d84d30a8fe326be4f98378dcb774dabf, type: 2}
+    Material: {fileID: 0}
     PropertiesSet: {fileID: 11400000, guid: 99d3374c56bc41b408704563b4c0e25e, type: 2}
+    fixNullRefSO_1: {fileID: 0}
   scale:
     x: 0.1666667
     y: 1
