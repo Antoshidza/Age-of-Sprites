@@ -13,7 +13,7 @@
 * +Poor example of producing units and building squads for strategy games
 
 ## Requirements
-* Unity 2022.2+
+* Unity 2022.2.3+
 * Entities v1.0.0-pre.15
 * [NSprites v2.0.0+](https://github.com/Antoshidza/NSprites/releases/tag/v2.0.0)
 
