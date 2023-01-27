@@ -71,6 +71,7 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 Packages/com.nsprites/
+Packages/com.nsprites.foundation/
 Assets/NSprites Test
 Assets/NSprites Test.meta
 ProjectSettings/EditorBuildSettings.asset

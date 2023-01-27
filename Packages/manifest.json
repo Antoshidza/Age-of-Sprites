@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "com.tonymax.nsprites": "https://github.com/Antoshidza/NSprites.git",
+    "com.tonymax.nsprites.foundation": "https://github.com/Antoshidza/NSprites-Foundation.git",
     "com.unity.2d.sprite": "1.0.0",
     "com.unity.ai.navigation": "1.1.1",
     "com.unity.burst": "1.8.2",
