@@ -1,4 +1,5 @@
-﻿using Unity.Collections;
+﻿using System.Linq;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
@@ -6,25 +7,71 @@ using UnityEngine.Serialization;
 
 namespace NSprites
 {
-    [BakeDerivedTypes]
-    public class SpriteAnimationAuthoring : BaseSpriteRendererAuthoring
+    /// <summary>
+    /// Advanced <see cref="SpriteRendererAuthoring"/> which also bakes animation data as blob asset and adds animation components.
+    /// </summary>
+    public class SpriteAnimationAuthoring : SpriteRendererAuthoring
     {
-        private class SpriteAnimationBaker : Baker<SpriteAnimationAuthoring>
+        private class Baker : Baker<SpriteAnimationAuthoring>
         {
             public override void Bake(SpriteAnimationAuthoring authoring)
             {
-                _ = DependsOn(authoring.AnimationSet);
+                BakeSpriteAnimation(this, authoring.AnimationSet, authoring.InitialAnimationIndex);
 
-                if (authoring.AnimationSet == null)
+                var initialAnimData = authoring.AnimationSet.Animations.ElementAt(authoring.InitialAnimationIndex).data;
+                var initialAnimMainTexST = (float4)NSpritesUtils.GetTextureST(initialAnimData.SpriteSheet);
+
+                BakeSpriteRender
+                (
+                    this,
+                    authoring,
+                    new float4(new float2(initialAnimMainTexST.xy / initialAnimData.FrameCount), 0f),
+                    authoring._pivot,
+                    authoring.VisualSize,
+                    removeDefaultTransform: authoring._excludeUnityTransformComponents
+                );
+                if(!authoring._disableSorting)
+                    BakeSpriteSorting
+                    (
+                        this,
+                        authoring._sortingIndex,
+                        authoring._sortingLayer,
+                        authoring._staticSorting
+                    );
+            }
+        }
+
+        [Header("Animation Data")]
+        [FormerlySerializedAs("_animationSet")] public SpriteAnimationSet AnimationSet;
+        [FormerlySerializedAs("_initialAnimationIndex")] public int InitialAnimationIndex;
+
+        public override float2 VisualSize
+        {
+            get
+            {
+                var animationData = AnimationSet.Animations.ElementAt(InitialAnimationIndex).data;
+                return GetSpriteSize(animationData.SpriteSheet) / animationData.FrameCount;
+            }
+        }
+
+        public static void BakeSpriteAnimation<TAuthoring>(Baker<TAuthoring> baker, SpriteAnimationSet animationSet, int initialAnimationIndex = 0)
+            where TAuthoring : MonoBehaviour
+        {
+                baker.DependsOn(animationSet);
+
+                if (animationSet == null)
                     return;
 
-                if (authoring.InitialAnimationIndex >= authoring.AnimationSet.Animations.Count)
-                    throw new System.Exception($"Initial animation index {authoring.InitialAnimationIndex} can't be great/equal to animation count {authoring.AnimationSet.Animations.Count}");
-
-                #region create blob asset
-                var blobBuilder = new BlobBuilder(Allocator.Temp); //can't use using because there is extension which use this + ref
+                if (initialAnimationIndex >= animationSet.Animations.Count || initialAnimationIndex < 0)
+                {
+                    Debug.LogError($"Initial animation index {initialAnimationIndex} can't be less than 0 or great/equal to animation count {animationSet.Animations.Count}");
+                    return;
+                }
+                
+                #region create animation blob asset
+                var blobBuilder = new BlobBuilder(Allocator.Temp); //can't use `using` keyword because there is extension which use this + ref
                 ref var root = ref blobBuilder.ConstructRoot<BlobArray<SpriteAnimationBlobData>>();
-                var animations = authoring.AnimationSet.Animations;
+                var animations = animationSet.Animations;
                 var animationArray = blobBuilder.Allocate(ref root, animations.Count);
 
                 var animIndex = 0;
@@ -53,26 +100,18 @@ namespace NSprites
                 }
 
                 var blobAssetReference = blobBuilder.CreateBlobAssetReference<BlobArray<SpriteAnimationBlobData>>(Allocator.Persistent);
-                AddBlobAsset(ref blobAssetReference, out _);
+                baker.AddBlobAsset(ref blobAssetReference, out _);
                 blobBuilder.Dispose();
                 #endregion
 
-                ref var initialAnim = ref blobAssetReference.Value[authoring.InitialAnimationIndex];
+                ref var initialAnim = ref blobAssetReference.Value[initialAnimationIndex];
 
-                AddComponent(new AnimationSetLink { value = blobAssetReference });
-                AddComponent(new AnimationIndex { value = authoring.InitialAnimationIndex });
-                AddComponent(new AnimationTimer { value = initialAnim.FrameDurations[0] });
-                AddComponent(new FrameIndex());
-
-                var frameSize = new float2(initialAnim.MainTexSTOnAtlas.xy / initialAnim.GridSize);
-                var framePosition = new int2(0 % initialAnim.GridSize.x, 0 / initialAnim.GridSize.x);
-                AddComponent(new MainTexSTInitial { value = initialAnim.MainTexSTOnAtlas });
-                AddComponent(new MainTexST { value = new float4(frameSize, initialAnim.MainTexSTOnAtlas.zw + frameSize * framePosition) });
-            }
+                baker.AddComponent(new AnimationSetLink { value = blobAssetReference });
+                baker.AddComponent(new AnimationIndex { value = initialAnimationIndex });
+                baker.AddComponent(new AnimationTimer { value = initialAnim.FrameDurations[0] });
+                baker.AddComponent<FrameIndex>();
+                
+                baker.AddComponent(new MainTexSTInitial { value = initialAnim.MainTexSTOnAtlas });
         }
-
-        [Header("Sprite Animation Data")]
-        [FormerlySerializedAs("_animationSet")] public SpriteAnimationSet AnimationSet;
-        [FormerlySerializedAs("_initialAnimationIndex")] public int InitialAnimationIndex;
     }
 }

@@ -2,7 +2,7 @@
 
 namespace NSprites
 {
-    public class SpriteRenderDataToRegistrate : IComponentData
+    public class SpriteRenderDataToRegister : IComponentData
     {
         public SpriteRenderData data;
     }

@@ -27,5 +27,5 @@ public class SquadDefaultSettingsAuthoring : MonoBehaviour
     [FormerlySerializedAs("_squadResolution")] public int2 SquadResolution;
     [FormerlySerializedAs("_soldierMargin")] public float2 SoldierMargin;
 
-    public float2 VisualSize => SoldierView.TryGetComponent<BaseSpriteRendererAuthoring>(out var authoring) ? authoring.VisualSize : new(1f);
+    public float2 VisualSize => SoldierView.TryGetComponent<SpriteRendererAuthoring>(out var authoring) ? authoring.VisualSize : new(1f);
 }
