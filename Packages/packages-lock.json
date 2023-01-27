@@ -8,14 +8,6 @@
         "com.unity.entities": "1.0.0-pre.15"
       }
     },
-    "com.tonymax.nsprites.foundation": {
-      "version": "file:com.nsprites.foundation",
-      "depth": 0,
-      "source": "embedded",
-      "dependencies": {
-        "com.unity.entities": "1.0.0-pre.15"
-      }
-    },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
       "depth": 0,
