@@ -5,5 +5,6 @@ using NSprites;
 [assembly: InstancedPropertyComponent(typeof(Scale2D), "_heightWidthBuffer", PropertyFormat.Float2)]
 [assembly: InstancedPropertyComponent(typeof(Pivot), "_pivotBuffer", PropertyFormat.Float2)]
 [assembly: InstancedPropertyComponent(typeof(SortingValue), "_sortingValueBuffer", PropertyFormat.Float)]
+[assembly: InstancedPropertyComponent(typeof(Flip), "_flipBuffer", PropertyFormat.Int2)]
 
 [assembly: DisableRenderingComponent(typeof(CullSpriteTag))]
