@@ -1,5 +1,12 @@
 {
   "dependencies": {
+    "com.needle.upm-in-unitypackage": {
+      "version": "https://github.com/needle-tools/upm-in-unitypackage.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "99f96a7bdb1ee66381517d8c8b6d1b526e47019f"
+    },
     "com.tonymax.nsprites": {
       "version": "file:com.nsprites",
       "depth": 0,
