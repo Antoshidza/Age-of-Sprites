@@ -20,7 +20,7 @@
       "depth": 0,
       "source": "embedded",
       "dependencies": {
-        "com.unity.entities": "1.0.0-pre.15"
+        "com.unity.entities": "1.0.0-pre.44"
       }
     },
     "com.unity.2d.sprite": {
