@@ -14,8 +14,8 @@
 
 ## Requirements
 * Unity 2022.2.3+
-* Entities v1.0.0-pre.15
-* [NSprites v2.0.0+](https://github.com/Antoshidza/NSprites/releases/tag/v2.0.0)
+* Entities v1.0.0-pre.65
+* [NSprites v3.1.0+](https://github.com/Antoshidza/NSprites/releases/tag/v3.1.0)
 
 ## How register render
 For this project I've used adding managed component to sprite entity to be able to register unique renders at runtime. Such solution doesn't scale well with growing count of existing sprites in scene. Though there are few possibilities to solve problem of managed components such as using components with fixed string GUID and then load managed data with AssetDatabase.
