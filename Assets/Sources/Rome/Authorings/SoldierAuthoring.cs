@@ -7,10 +7,11 @@ public class SoldierAuthoring : MonoBehaviour
     {
         public override void Bake(SoldierAuthoring authoring)
         {
-            AddComponent<SoldierTag>();
-            AddComponent<Destination>();
-            AddComponent<MoveTimer>();
-            AddComponent(new MoveSpeed { value = authoring.MoveSpeed });
+            var entity = GetEntity(TransformUsageFlags.None);
+            AddComponent<SoldierTag>(entity);
+            AddComponent<Destination>(entity);
+            AddComponent<MoveTimer>(entity);
+            AddComponent(entity, new MoveSpeed { value = authoring.MoveSpeed });
         }
     }
 

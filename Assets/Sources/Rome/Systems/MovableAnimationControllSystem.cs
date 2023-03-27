@@ -3,9 +3,6 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 
-#pragma warning disable CS0282 // I guess because of DOTS's codegen
-// https://forum.unity.com/threads/compilation-of-issues-with-0-50.1253973/page-2#post-8512268
-
 [BurstCompile]
 public partial struct MovableAnimationControllSystem : ISystem
 {
@@ -37,32 +34,34 @@ public partial struct MovableAnimationControllSystem : ISystem
             }
         }
     }
+
     private struct SystemData : IComponentData
     {
-        public EntityQuery gotUnderWayQuery;
+        public EntityQuery startedToMoveQuery;
         public EntityQuery stopedQuery;
     }
+
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
         var systemData = new SystemData();
         var queryBuilder = new EntityQueryBuilder(Allocator.Temp)
             .WithNone<CullSpriteTag>()
-            .WithAll<AnimationIndex>()
-            .WithAll<AnimationTimer>()
-            .WithAll<FrameIndex>()
+            .WithAllRW<AnimationIndex>()
+            .WithAllRW<AnimationTimer>()
+            .WithAllRW<FrameIndex>()
             .WithAll<AnimationSetLink>()
-            .WithAll<Destination>()
-            .WithAll<MoveTimer>();
+            .WithAll<Destination, MoveTimer>();
         var gotUnderWayQuery = state.GetEntityQuery(queryBuilder);
         gotUnderWayQuery.AddOrderVersionFilter();
-        systemData.gotUnderWayQuery = gotUnderWayQuery;
+        systemData.startedToMoveQuery = gotUnderWayQuery;
 
         queryBuilder.Reset();
-        _ = queryBuilder.WithNone<CullSpriteTag>()
-            .WithAll<AnimationIndex>()
-            .WithAll<AnimationTimer>()
-            .WithAll<FrameIndex>()
+        _ = queryBuilder
+            .WithNone<CullSpriteTag>()
+            .WithAllRW<AnimationIndex>()
+            .WithAllRW<AnimationTimer>()
+            .WithAllRW<FrameIndex>()
             .WithAll<AnimationSetLink>()
             .WithAll<Destination>()
             .WithNone<MoveTimer>();
@@ -75,9 +74,6 @@ public partial struct MovableAnimationControllSystem : ISystem
         queryBuilder.Dispose();
     }
 
-    public void OnDestroy(ref SystemState state)
-    {
-    }
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
@@ -91,7 +87,7 @@ public partial struct MovableAnimationControllSystem : ISystem
             setToAnimationID = animationSettings.WalkHash,
             time = time
         };
-        state.Dependency = gotUnderWayChangeAnimationJob.ScheduleParallelByRef(systemData.gotUnderWayQuery, state.Dependency);
+        state.Dependency = gotUnderWayChangeAnimationJob.ScheduleParallelByRef(systemData.startedToMoveQuery, state.Dependency);
 
         var stopedChangeAnimationJob = new ChangeAnimation
         {

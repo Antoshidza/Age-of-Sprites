@@ -13,9 +13,9 @@ public class SquadDefaultSettingsAuthoring : MonoBehaviour
             if (authoring.SoldierView == null)
                 return;
 
-            AddComponent(new SquadDefaultSettings
+            AddComponent(GetEntity(TransformUsageFlags.None), new SquadDefaultSettings
             {
-                soldierPrefab = GetEntity(authoring.SoldierView),
+                soldierPrefab = GetEntity(authoring.SoldierView, TransformUsageFlags.None),
                 soldierSize = authoring.VisualSize,
                 defaultSettings = new SquadSettings { soldierMargin = authoring.SoldierMargin, squadResolution = authoring.SquadResolution }
             });

@@ -12,13 +12,13 @@ public class MapAuthoring : MonoBehaviour
             if (authoring.RockPrefabs == null)
                 return;
 
-            var rockCollectionEntity = CreateAdditionalEntity();
+            var rockCollectionEntity = CreateAdditionalEntity(TransformUsageFlags.None);
             var rockBuffer = AddBuffer<PrefabLink>(rockCollectionEntity);
             rockBuffer.Capacity = authoring.RockPrefabs.Length;
             for (int i = 0; i < authoring.RockPrefabs.Length; i++)
-                _ = rockBuffer.Add(new PrefabLink { link = GetEntity(authoring.RockPrefabs[i]) });
+                _ = rockBuffer.Add(new PrefabLink { link = GetEntity(authoring.RockPrefabs[i], TransformUsageFlags.None) });
 
-            AddComponent(new MapSettings
+            AddComponent(GetEntity(TransformUsageFlags.None), new MapSettings
             {
                 rockCollectionLink = rockCollectionEntity,
                 rockCount = authoring.RockCount,

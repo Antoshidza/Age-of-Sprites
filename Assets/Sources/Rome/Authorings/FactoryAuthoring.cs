@@ -9,17 +9,19 @@ public class FactoryAuthoring : MonoBehaviour
     {
         public override void Bake(FactoryAuthoring authoring)
         {
+            var entity = GetEntity(TransformUsageFlags.None);
             AddComponent
             (
+                entity,
                 new FactoryData
                 {
-                    prefab = GetEntity(authoring.Prefab),
+                    prefab = GetEntity(authoring.Prefab, TransformUsageFlags.None),
                     instantiatePos = new float2(authoring.transform.position.x, authoring.transform.position.y) + authoring.SpawnOffset,
                     count = authoring.SpawnCount,
                     duration = authoring.Duration
                 }
             );
-            AddComponent(new FactoryTimer { value = authoring.RandomInitialDuration ? UnityEngine.Random.Range(0f, authoring.Duration) : authoring.Duration });
+            AddComponent(entity, new FactoryTimer { value = authoring.RandomInitialDuration ? UnityEngine.Random.Range(0f, authoring.Duration) : authoring.Duration });
         }
     }
 

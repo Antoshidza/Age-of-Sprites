@@ -9,7 +9,7 @@ namespace NSprites
         {
             public override void Bake(AnimationSettingsAuthoring authoring)
             {
-                AddComponent(new AnimationSettings
+                AddComponent(GetEntity(TransformUsageFlags.None), new AnimationSettings
                 {
                     IdleHash = Animator.StringToHash("idle"),
                     WalkHash = Animator.StringToHash("walk")
