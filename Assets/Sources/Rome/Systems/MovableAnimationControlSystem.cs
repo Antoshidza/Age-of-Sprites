@@ -4,32 +4,38 @@ using Unity.Collections;
 using Unity.Entities;
 
 [BurstCompile]
-public partial struct MovableAnimationControllSystem : ISystem
+[UpdateBefore(typeof(SpriteUVAnimationSystem))]
+public partial struct MovableAnimationControlSystem : ISystem
 {
-    [BurstCompile]
-    private partial struct ChangeAnimation : IJobEntity
+    [BurstCompile(FloatPrecision.High, FloatMode.Default)]
+    private partial struct ChangeAnimationJob : IJobEntity
     {
         public int setToAnimationID;
         public double time;
 
-        public void Execute(ref AnimationIndex animationIndex, ref AnimationTimer timer, ref FrameIndex frameIndex, in AnimationSetLink animationSetLink)
+        public void Execute(Entity entity, ref AnimationIndex animationIndex, ref AnimationTimer timer, ref FrameIndex frameIndex, in AnimationSetLink animationSetLink)
         {
             // find animation by animation ID
             ref var animSet = ref animationSetLink.value.Value;
-            var setToAnimIndex = 0;
-            for (int i = 1; i < animSet.Length; i++)
+            var setToAnimIndex = -1;
+            for (int i = 0; i < animSet.Length; i++)
                 if (animSet[i].ID == setToAnimationID)
                 {
                     setToAnimIndex = i;
                     break;
                 }
 
+            if (setToAnimIndex == -1)
+                throw new NSpritesException($"{nameof(ChangeAnimationJob)}: incorrect {nameof(setToAnimationID)} was passed. {entity} has no animation with such hash ({setToAnimationID}) was found");
+
             if (animationIndex.value != setToAnimIndex)
             {
+                // Debug.Log($"{setToAnimationID} was founded under {setToAnimIndex} index");
+                ref var animData = ref animSet[setToAnimIndex];
                 animationIndex.value = setToAnimIndex;
                 // here we want to set last frame and timer to 0 (equal to current time) to force animation system instantly switch
                 // animation to 1st frame after we've modified it
-                frameIndex.value = animSet[setToAnimIndex].FrameDurations.Length;
+                frameIndex.value = animData.FrameDurations.Length - 1;
                 timer.value = time;
             }
         }
@@ -38,7 +44,7 @@ public partial struct MovableAnimationControllSystem : ISystem
     private struct SystemData : IComponentData
     {
         public EntityQuery startedToMoveQuery;
-        public EntityQuery stopedQuery;
+        public EntityQuery stoppedQuery;
     }
 
     [BurstCompile]
@@ -52,9 +58,9 @@ public partial struct MovableAnimationControllSystem : ISystem
             .WithAllRW<FrameIndex>()
             .WithAll<AnimationSetLink>()
             .WithAll<Destination, MoveTimer>();
-        var gotUnderWayQuery = state.GetEntityQuery(queryBuilder);
-        gotUnderWayQuery.AddOrderVersionFilter();
-        systemData.startedToMoveQuery = gotUnderWayQuery;
+        var startedToMoveQuery = state.GetEntityQuery(queryBuilder);
+        startedToMoveQuery.AddOrderVersionFilter();
+        systemData.startedToMoveQuery = startedToMoveQuery;
 
         queryBuilder.Reset();
         _ = queryBuilder
@@ -65,9 +71,9 @@ public partial struct MovableAnimationControllSystem : ISystem
             .WithAll<AnimationSetLink>()
             .WithAll<Destination>()
             .WithNone<MoveTimer>();
-        var stopedQuery = state.GetEntityQuery(queryBuilder);
-        stopedQuery.AddOrderVersionFilter();
-        systemData.stopedQuery = stopedQuery;
+        var stoppedQuery = state.GetEntityQuery(queryBuilder);
+        stoppedQuery.AddOrderVersionFilter();
+        systemData.stoppedQuery = stoppedQuery;
 
         _ = state.EntityManager.AddComponentData(state.SystemHandle, systemData);
 
@@ -82,18 +88,18 @@ public partial struct MovableAnimationControllSystem : ISystem
             return;
         var time = SystemAPI.Time.ElapsedTime;
 
-        var gotUnderWayChangeAnimationJob = new ChangeAnimation
+        var startedToMoveChangeAnimationJob = new ChangeAnimationJob
         {
             setToAnimationID = animationSettings.WalkHash,
             time = time
         };
-        state.Dependency = gotUnderWayChangeAnimationJob.ScheduleParallelByRef(systemData.startedToMoveQuery, state.Dependency);
+        state.Dependency = startedToMoveChangeAnimationJob.ScheduleParallelByRef(systemData.startedToMoveQuery, state.Dependency);
 
-        var stopedChangeAnimationJob = new ChangeAnimation
+        var stoppedChangeAnimationJob = new ChangeAnimationJob
         {
             setToAnimationID = animationSettings.IdleHash,
             time = time
         };
-        state.Dependency = stopedChangeAnimationJob.ScheduleParallel(systemData.stopedQuery, state.Dependency);
+        state.Dependency = stoppedChangeAnimationJob.ScheduleParallel(systemData.stoppedQuery, state.Dependency);
     }
 }
