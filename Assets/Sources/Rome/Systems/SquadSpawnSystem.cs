@@ -4,9 +4,6 @@ using Unity.Collections;
 using Unity.Entities;
 using UnityEngine;
 
-#pragma warning disable CS0282 // I guess because of DOTS's codegen
-// https://forum.unity.com/threads/compilation-of-issues-with-0-50.1253973/page-2#post-8512268
-
 [WorldSystemFilter(WorldSystemFilterFlags.Default)]
 [UpdateInGroup(typeof(SimulationSystemGroup))]
 [BurstCompile]
@@ -14,7 +11,7 @@ public partial struct SquadSpawnSystem : ISystem
 {
     private struct SystemData : IComponentData
     {
-        public EntityArchetype squadArchetype;
+        public EntityArchetype SquadArchetype;
     }
 
     [BurstCompile]
@@ -26,16 +23,13 @@ public partial struct SquadSpawnSystem : ISystem
         typeArray[2] = ComponentType.ReadOnly<SoldierLink>();
         typeArray[3] = ComponentType.ReadOnly<RequireSoldier>();
 
-        var systemData = new SystemData{ squadArchetype = state.EntityManager.CreateArchetype(typeArray) };
+        var systemData = new SystemData{ SquadArchetype = state.EntityManager.CreateArchetype(typeArray) };
 
         _ = state.EntityManager.AddComponentData(state.SystemHandle, systemData);
 
         typeArray.Dispose();
     }
-
-    public void OnDestroy(ref SystemState state)
-    {
-    }
+    
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
@@ -48,7 +42,7 @@ public partial struct SquadSpawnSystem : ISystem
         var squadSettings = SystemAPI.GetSingleton<SquadDefaultSettings>();
         var soldierCount = squadSettings.SoldierCount;
 
-        var squadEntity = ecb.CreateEntity(systemData.squadArchetype);
+        var squadEntity = ecb.CreateEntity(systemData.SquadArchetype);
         ecb.SetComponent(squadEntity, new RequireSoldier { count = soldierCount });
     }
 }

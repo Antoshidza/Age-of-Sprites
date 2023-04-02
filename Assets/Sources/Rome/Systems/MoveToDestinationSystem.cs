@@ -6,9 +6,6 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 
-#pragma warning disable CS0282 // I guess because of DOTS's codegen
-// https://forum.unity.com/threads/compilation-of-issues-with-0-50.1253973/page-2#post-8512268
-
 [BurstCompile]
 public partial struct MoveToDestinationSystem : ISystem
 {
@@ -16,68 +13,68 @@ public partial struct MoveToDestinationSystem : ISystem
     [BurstCompile]
     private struct CalculateMoveTimerJob : IJobChunk
     {
-        private const float threshold = .01f;
+        private const float Threshold = .01f;
 
-        [ReadOnly] public EntityTypeHandle entityTypeHandle;
-        public ComponentTypeHandle<MoveTimer> moveTimer_CTH_RW;
-        [ReadOnly] public ComponentTypeHandle<MoveSpeed> moveSpeed_CTH_RO;
-        [ReadOnly] public ComponentTypeHandle<WorldPosition2D> worldPosition2D_CTH_RO;
-        [ReadOnly] public ComponentTypeHandle<Destination> destionation_CTH_RO;
-        public EntityCommandBuffer.ParallelWriter ecb;
-        public uint lastSystemVersion;
+        [ReadOnly] public EntityTypeHandle EntityTypeHandle;
+        public ComponentTypeHandle<MoveTimer> MoveTimer_CTH_RW;
+        [ReadOnly] public ComponentTypeHandle<MoveSpeed> MoveSpeed_CTH_RO;
+        [ReadOnly] public ComponentTypeHandle<WorldPosition2D> WorldPosition2D_CTH_RO;
+        [ReadOnly] public ComponentTypeHandle<Destination> Destionation_CTH_RO;
+        public EntityCommandBuffer.ParallelWriter ECB;
+        public uint LastSystemVersion;
 
         public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
         {
-            if (chunk.DidChange(ref destionation_CTH_RO, lastSystemVersion)
-                || chunk.DidChange(ref moveSpeed_CTH_RO, lastSystemVersion))
+            if (chunk.DidChange(ref Destionation_CTH_RO, LastSystemVersion)
+                || chunk.DidChange(ref MoveSpeed_CTH_RO, LastSystemVersion))
             {
-                var entities = chunk.GetNativeArray(entityTypeHandle);
-                var worldPositions = chunk.GetNativeArray(ref worldPosition2D_CTH_RO);
-                var moveSpeeds = chunk.GetNativeArray(ref moveSpeed_CTH_RO);
-                var destionations = chunk.GetNativeArray(ref destionation_CTH_RO);
-                var timers = chunk.GetNativeArray(ref moveTimer_CTH_RW);
+                var entities = chunk.GetNativeArray(EntityTypeHandle);
+                var worldPositions = chunk.GetNativeArray(ref WorldPosition2D_CTH_RO);
+                var moveSpeeds = chunk.GetNativeArray(ref MoveSpeed_CTH_RO);
+                var destinations = chunk.GetNativeArray(ref Destionation_CTH_RO);
+                var timers = chunk.GetNativeArray(ref MoveTimer_CTH_RW);
 
                 for (int entityIndex = 0; entityIndex < entities.Length; entityIndex++)
                 {
-                    var distance = math.length(destionations[entityIndex].value - worldPositions[entityIndex].value);
-                    if (distance > threshold)
+                    var distance = math.length(destinations[entityIndex].value - worldPositions[entityIndex].value);
+                    if (distance > Threshold)
                     {
-                        timers[entityIndex] = new MoveTimer { remainingTime = GetRamainingTime(distance, moveSpeeds[entityIndex].value) };
-                        if (!chunk.IsComponentEnabled(ref moveTimer_CTH_RW, entityIndex))
-                            ecb.SetComponentEnabled<MoveTimer>(unfilteredChunkIndex, entities[entityIndex], true);
+                        timers[entityIndex] = new MoveTimer { remainingTime = GetRemainingTime(distance, moveSpeeds[entityIndex].value) };
+                        if (!chunk.IsComponentEnabled(ref MoveTimer_CTH_RW, entityIndex))
+                            ECB.SetComponentEnabled<MoveTimer>(unfilteredChunkIndex, entities[entityIndex], true);
                     }
                 }
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static float GetRamainingTime(in float2 pos, in float2 dest, float speed)
-            => GetRamainingTime(math.length(dest - pos), speed);
+        private static float GetRemainingTime(in float2 pos, in float2 dest, float speed)
+            => GetRemainingTime(math.length(dest - pos), speed);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static float GetRamainingTime(in float distance, float speed)
+        private static float GetRemainingTime(in float distance, float speed)
             => distance / speed;
     }
     [BurstCompile]
     private partial struct MoveJob : IJobEntity
     {
-        public float deltaTime;
-        public EntityCommandBuffer.ParallelWriter ecb;
+        public float DeltaTime;
+        public EntityCommandBuffer.ParallelWriter ECB;
 
         private void Execute(Entity entity, [ChunkIndexInQuery] int chunkIndex, ref WorldPosition2D pos, ref MoveTimer timer, in Destination destination)
         {
-            var remainingDelta = math.max(timer.remainingTime, deltaTime - timer.remainingTime);
+            var remainingDelta = math.max(timer.remainingTime, DeltaTime - timer.remainingTime);
             // move pos in a direction of current destination by passed frac of whole remaining move time
-            pos.value += (destination.value - pos.value) * deltaTime / remainingDelta;
-            timer.remainingTime = math.max(0, timer.remainingTime - deltaTime);
+            pos.value += (destination.value - pos.value) * DeltaTime / remainingDelta;
+            timer.remainingTime = math.max(0, timer.remainingTime - DeltaTime);
 
             if (timer.remainingTime == 0f)
-                ecb.SetComponentEnabled<MoveTimer>(chunkIndex, entity, false);
+                ECB.SetComponentEnabled<MoveTimer>(chunkIndex, entity, false);
         }
     }
     #endregion
 
     private struct SystemData : IComponentData
     {
-        public EntityQuery movableQuery;
+        public EntityQuery MovableQuery;
     }
 
     [BurstCompile]
@@ -87,14 +84,10 @@ public partial struct MoveToDestinationSystem : ISystem
             .WithAll<MoveSpeed>()
             .WithAll<WorldPosition2D>()
             .WithAll<Destination>();
-        var systemData = new SystemData{ movableQuery = state.GetEntityQuery(queryBuilder) };
+        var systemData = new SystemData{ MovableQuery = state.GetEntityQuery(queryBuilder) };
         _ = state.EntityManager.AddComponentData(state.SystemHandle, systemData);
 
         queryBuilder.Dispose();
-    }
-
-    public void OnDestroy(ref SystemState state)
-    {
     }
 
     [BurstCompile]
@@ -103,23 +96,23 @@ public partial struct MoveToDestinationSystem : ISystem
         var systemData = SystemAPI.GetComponent<SystemData>(state.SystemHandle);
         var ecbSystem = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
 
-        /// [re]calculate <see cref="MoveTimer"/> if <see cref="MoveSpeed"/> or <see cref="Destination"/> was changed
+        // recalculate MoveTimer if MoveSpeed or Destination was changed
         var calculateMoveTimerJob = new CalculateMoveTimerJob
         {
-            entityTypeHandle = SystemAPI.GetEntityTypeHandle(),
-            moveTimer_CTH_RW = SystemAPI.GetComponentTypeHandle<MoveTimer>(false),
-            moveSpeed_CTH_RO = SystemAPI.GetComponentTypeHandle<MoveSpeed>(true),
-            worldPosition2D_CTH_RO = SystemAPI.GetComponentTypeHandle<WorldPosition2D>(true),
-            destionation_CTH_RO = SystemAPI.GetComponentTypeHandle<Destination>(true),
-            ecb = ecbSystem.CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter(),
-            lastSystemVersion = state.LastSystemVersion
+            EntityTypeHandle = SystemAPI.GetEntityTypeHandle(),
+            MoveTimer_CTH_RW = SystemAPI.GetComponentTypeHandle<MoveTimer>(false),
+            MoveSpeed_CTH_RO = SystemAPI.GetComponentTypeHandle<MoveSpeed>(true),
+            WorldPosition2D_CTH_RO = SystemAPI.GetComponentTypeHandle<WorldPosition2D>(true),
+            Destionation_CTH_RO = SystemAPI.GetComponentTypeHandle<Destination>(true),
+            ECB = ecbSystem.CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter(),
+            LastSystemVersion = state.LastSystemVersion
         };
-        state.Dependency = calculateMoveTimerJob.ScheduleParallelByRef(systemData.movableQuery, state.Dependency);
+        state.Dependency = calculateMoveTimerJob.ScheduleParallelByRef(systemData.MovableQuery, state.Dependency);
 
         var moveJob = new MoveJob
         {
-            deltaTime = SystemAPI.Time.DeltaTime,
-            ecb = ecbSystem.CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter()
+            DeltaTime = SystemAPI.Time.DeltaTime,
+            ECB = ecbSystem.CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter()
         };
         state.Dependency = moveJob.ScheduleParallelByRef(state.Dependency);
     }
