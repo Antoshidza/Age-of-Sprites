@@ -8,7 +8,6 @@ using Unity.Entities;
 public partial struct MovableAnimationControlSystem : ISystem
 {
     [BurstCompile]
-    [WithChangeFilter(typeof(MovingTag))]
     private partial struct ChangeAnimationJob : IJobEntity
     {
         public AnimationSettings AnimationSettings;
