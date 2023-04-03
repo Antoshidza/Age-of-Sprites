@@ -1,6 +1,6 @@
 ﻿using Unity.Entities;
 
-public struct MoveTimer : IComponentData, IEnableableComponent
+public struct MoveTimer : IComponentData
 {
-    public float remainingTime;
+    public float RemainingTime;
 }

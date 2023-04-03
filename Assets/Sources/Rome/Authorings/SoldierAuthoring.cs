@@ -9,6 +9,8 @@ public class SoldierAuthoring : MonoBehaviour
         {
             var entity = GetEntity(TransformUsageFlags.None);
             AddComponent<SoldierTag>(entity);
+            AddComponent<MovingTag>(entity);
+            SetComponentEnabled<MovingTag>(entity, false);
             AddComponent<Destination>(entity);
             AddComponent<MoveTimer>(entity);
             AddComponent(entity, new MoveSpeed { value = authoring.MoveSpeed });

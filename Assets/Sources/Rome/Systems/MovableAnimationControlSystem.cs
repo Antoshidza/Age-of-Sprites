@@ -7,22 +7,22 @@ using Unity.Entities;
 [UpdateBefore(typeof(SpriteUVAnimationSystem))]
 public partial struct MovableAnimationControlSystem : ISystem
 {
-    [BurstCompile(FloatPrecision.High, FloatMode.Default)]
+    [BurstCompile]
+    [WithChangeFilter(typeof(MovingTag))]
     private partial struct ChangeAnimationJob : IJobEntity
     {
-        public int SetToAnimationID;
+        public AnimationSettings AnimationSettings;
         public double Time;
 
-        private void Execute(ref AnimatorAspect animator)
+        private void Execute(ref AnimatorAspect animator, EnabledRefRO<MovingTag> movingTagEnabled)
         {
-            animator.SetAnimation(SetToAnimationID, Time);
+            animator.SetAnimation(movingTagEnabled.ValueRO ? AnimationSettings.WalkHash : AnimationSettings.IdleHash, Time);
         }
     }
 
     private struct SystemData : IComponentData
     {
-        public EntityQuery StartedToMoveQuery;
-        public EntityQuery StoppedQuery;
+        public EntityQuery MovableQuery;
     }
 
     [BurstCompile]
@@ -30,22 +30,12 @@ public partial struct MovableAnimationControlSystem : ISystem
     {
         var systemData = new SystemData();
         var queryBuilder = new EntityQueryBuilder(Allocator.Temp)
-            .WithNone<CullSpriteTag>()
+            .WithAll<MovingTag>()
             .WithAspect<AnimatorAspect>()
-            .WithAll<Destination, MoveTimer>();
-        var startedToMoveQuery = state.GetEntityQuery(queryBuilder);
-        startedToMoveQuery.AddOrderVersionFilter();
-        systemData.StartedToMoveQuery = startedToMoveQuery;
-
-        queryBuilder.Reset();
-        _ = queryBuilder
-            .WithNone<CullSpriteTag>()
-            .WithAspect<AnimatorAspect>()
-            .WithAll<Destination>()
-            .WithNone<MoveTimer>();
-        var stoppedQuery = state.GetEntityQuery(queryBuilder);
-        stoppedQuery.AddOrderVersionFilter();
-        systemData.StoppedQuery = stoppedQuery;
+            .WithOptions(EntityQueryOptions.IgnoreComponentEnabledState);
+        var movableQuery = state.GetEntityQuery(queryBuilder);
+        movableQuery.AddChangedVersionFilter(ComponentType.ReadOnly<MovingTag>());
+        systemData.MovableQuery = movableQuery;
 
         _ = state.EntityManager.AddComponentData(state.SystemHandle, systemData);
 
@@ -60,18 +50,11 @@ public partial struct MovableAnimationControlSystem : ISystem
             return;
         var time = SystemAPI.Time.ElapsedTime;
 
-        var startedToMoveChangeAnimationJob = new ChangeAnimationJob
+        var animationSwitchJob = new ChangeAnimationJob
         {
-            SetToAnimationID = animationSettings.WalkHash,
+            AnimationSettings = animationSettings,
             Time = time
         };
-        state.Dependency = startedToMoveChangeAnimationJob.ScheduleParallelByRef(systemData.StartedToMoveQuery, state.Dependency);
-
-        var stoppedChangeAnimationJob = new ChangeAnimationJob
-        {
-            SetToAnimationID = animationSettings.IdleHash,
-            Time = time
-        };
-        state.Dependency = stoppedChangeAnimationJob.ScheduleParallel(systemData.StoppedQuery, state.Dependency);
+        state.Dependency = animationSwitchJob.ScheduleParallelByRef(systemData.MovableQuery, state.Dependency);
     }
 }

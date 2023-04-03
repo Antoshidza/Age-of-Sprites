@@ -98,6 +98,7 @@ public partial struct SquadMoveSystem : ISystem
         if (systemData.PrevSquadSettings != squadDefaultSettings)
         {
             systemData.PrevSquadSettings = squadDefaultSettings;
+            SystemAPI.SetSingleton(systemData);
 
             var moveOnSettingChangeJob = new MoveOnChangeGlobalSettingsJob
             {

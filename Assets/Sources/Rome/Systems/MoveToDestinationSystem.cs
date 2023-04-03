@@ -9,24 +9,6 @@ using Unity.Mathematics;
 [BurstCompile]
 public partial struct MoveToDestinationSystem : ISystem
 {
-    private readonly partial struct EnableableMoveTimer : IAspect
-    {
-        private readonly RefRW<MoveTimer> _timerValue;
-        private readonly EnabledRefRW<MoveTimer> _timerEnabled;
-
-        public float RemainingTime
-        {
-            get => _timerValue.ValueRO.remainingTime;
-            set => _timerValue.ValueRW = new MoveTimer { remainingTime = value };
-        }
-
-        public bool Enabled
-        {
-            get => _timerEnabled.ValueRO;
-            set => _timerEnabled.ValueRW = value;
-        }
-    }
-    
     #region jobs
     [BurstCompile]
     private struct CalculateMoveTimerJob : IJobChunk
@@ -38,6 +20,7 @@ public partial struct MoveToDestinationSystem : ISystem
         [ReadOnly] public ComponentTypeHandle<MoveSpeed> MoveSpeed_CTH_RO;
         [ReadOnly] public ComponentTypeHandle<WorldPosition2D> WorldPosition2D_CTH_RO;
         [ReadOnly] public ComponentTypeHandle<Destination> Destionation_CTH_RO;
+        public ComponentTypeHandle<MovingTag> MovingTag_CTH_RW;
         public uint LastSystemVersion;
 
         public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
@@ -56,9 +39,9 @@ public partial struct MoveToDestinationSystem : ISystem
                     var distance = math.length(destinations[entityIndex].value - worldPositions[entityIndex].value);
                     if (distance > Threshold)
                     {
-                        timers[entityIndex] = new MoveTimer { remainingTime = GetRemainingTime(distance, moveSpeeds[entityIndex].value) };
-                        if (!chunk.IsComponentEnabled(ref MoveTimer_CTH_RW, entityIndex))
-                            chunk.SetComponentEnabled(ref MoveTimer_CTH_RW, entityIndex, true);
+                        timers[entityIndex] = new MoveTimer { RemainingTime = GetRemainingTime(distance, moveSpeeds[entityIndex].value) };
+                        if (!chunk.IsComponentEnabled(ref MovingTag_CTH_RW, entityIndex))
+                            chunk.SetComponentEnabled(ref MovingTag_CTH_RW, entityIndex, true);
                     }
                 }
             }
@@ -71,11 +54,13 @@ public partial struct MoveToDestinationSystem : ISystem
             => distance / speed;
     }
     [BurstCompile]
+    [WithAll(typeof(MovingTag))]
     private partial struct MoveJob : IJobEntity
     {
         public float DeltaTime;
+        [NativeDisableParallelForRestriction] public ComponentLookup<MovingTag> MovingTag_CL_RW;
 
-        private void Execute(Entity entity, [ChunkIndexInQuery] int chunkIndex, ref WorldPosition2D pos, ref EnableableMoveTimer timer, in Destination destination)
+        private void Execute(Entity entity, ref WorldPosition2D pos, ref MoveTimer timer, in Destination destination)
         {
             var remainingDelta = math.max(timer.RemainingTime, DeltaTime - timer.RemainingTime);
             // move pos in a direction of current destination by passed frac of whole remaining move time
@@ -83,7 +68,7 @@ public partial struct MoveToDestinationSystem : ISystem
             timer.RemainingTime = math.max(0, timer.RemainingTime - DeltaTime);
 
             if (timer.RemainingTime == 0f)
-                timer.Enabled = false;
+                MovingTag_CL_RW.SetComponentEnabled(entity, false);
         }
     }
     #endregion
@@ -119,6 +104,7 @@ public partial struct MoveToDestinationSystem : ISystem
             MoveSpeed_CTH_RO = SystemAPI.GetComponentTypeHandle<MoveSpeed>(true),
             WorldPosition2D_CTH_RO = SystemAPI.GetComponentTypeHandle<WorldPosition2D>(true),
             Destionation_CTH_RO = SystemAPI.GetComponentTypeHandle<Destination>(true),
+            MovingTag_CTH_RW = SystemAPI.GetComponentTypeHandle<MovingTag>(false),
             LastSystemVersion = state.LastSystemVersion
         };
         state.Dependency = calculateMoveTimerJob.ScheduleParallelByRef(systemData.MovableQuery, state.Dependency);
@@ -126,6 +112,7 @@ public partial struct MoveToDestinationSystem : ISystem
         var moveJob = new MoveJob
         {
             DeltaTime = SystemAPI.Time.DeltaTime,
+            MovingTag_CL_RW = SystemAPI.GetComponentLookup<MovingTag>(false)
         };
         state.Dependency = moveJob.ScheduleParallelByRef(state.Dependency);
     }
