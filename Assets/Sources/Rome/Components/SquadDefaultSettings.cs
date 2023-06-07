@@ -6,14 +6,12 @@ using Unity.Mathematics;
 public struct SquadDefaultSettings : IComponentData, IEquatable<SquadDefaultSettings>
 {
     public Entity soldierPrefab;
-    public float2 soldierSize;
     public SquadSettings defaultSettings;
 
     public float2 SoldierMargin => defaultSettings.soldierMargin;
     public int2 SquadResolution => defaultSettings.squadResolution;
 
     public int SoldierCount => SquadResolution.x * SquadResolution.y;
-    public float2 SquadSize => GetSquadSize(SquadResolution, soldierSize, SoldierMargin);
 
     public bool Equals(SquadDefaultSettings other)
     {

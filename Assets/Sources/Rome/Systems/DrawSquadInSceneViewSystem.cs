@@ -48,6 +48,7 @@ public partial struct DrawSquadInSceneViewSystem : ISystem
         if (!SystemAPI.TryGetSingleton<SquadDefaultSettings>(out var squadGlobalSettings))
             return;
 
+        var soldierSize = SystemAPI.GetComponent<Scale2D>(squadGlobalSettings.soldierPrefab).value;
         var settings = _squadQuery.ToComponentDataListAsync<SquadSettings>(Allocator.TempJob, out var settings_GatherHandle);
         var positions = _squadQuery.ToComponentDataListAsync<WorldPosition2D>(Allocator.TempJob, out var poisitions_GatherHandle);
 
@@ -57,16 +58,16 @@ public partial struct DrawSquadInSceneViewSystem : ISystem
         {
             var squadPos = positions[squadIndex].value;
             var setting = settings[squadIndex];
-            var squadSize = SquadDefaultSettings.GetSquadSize(setting.squadResolution, squadGlobalSettings.soldierSize, setting.soldierMargin);
+            var squadSize = SquadDefaultSettings.GetSquadSize(setting.squadResolution, soldierSize, setting.soldierMargin);
             var rect = new float2x2(squadPos, squadPos + squadSize);
             Utils.DrawRect(rect, Color.cyan, 0f, Utils.DrawType.Debug);
 
             var soldierCount = setting.squadResolution.x * setting.squadResolution.y;
-            var perSoldierOffset = (2 * setting.soldierMargin + 1f) * squadGlobalSettings.soldierSize;
+            var perSoldierOffset = (2 * setting.soldierMargin + 1f) * soldierSize;
 
             for (int soldierIndex = 0; soldierIndex < soldierCount; soldierIndex++)
             {
-                var rectSize = squadGlobalSettings.soldierSize / 16f;
+                var rectSize = soldierSize / 16f;
                 var soldierPos = new float2(0f, rectSize.y * 1.5f) + squadPos + (perSoldierOffset * new float2(soldierIndex % setting.squadResolution.x + .5f, soldierIndex / setting.squadResolution.x));
                 var soldierRect = new float2x2(soldierPos - rectSize, soldierPos + rectSize);
                 Utils.DrawRect(soldierRect, Color.green, 0f, Utils.DrawType.Debug);
