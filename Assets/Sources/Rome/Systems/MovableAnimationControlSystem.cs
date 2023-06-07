@@ -13,7 +13,7 @@ public partial struct MovableAnimationControlSystem : ISystem
         public AnimationSettings AnimationSettings;
         public double Time;
 
-        private void Execute(ref AnimatorAspect animator, EnabledRefRO<MovingTag> movingTagEnabled)
+        private void Execute(AnimatorAspect animator, EnabledRefRO<MovingTag> movingTagEnabled)
         {
             animator.SetAnimation(movingTagEnabled.ValueRO ? AnimationSettings.WalkHash : AnimationSettings.IdleHash, Time);
         }
