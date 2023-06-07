@@ -16,16 +16,12 @@ public class SquadDefaultSettingsAuthoring : MonoBehaviour
             AddComponent(GetEntity(TransformUsageFlags.None), new SquadDefaultSettings
             {
                 soldierPrefab = GetEntity(authoring.SoldierView, TransformUsageFlags.None),
-                soldierSize = authoring.VisualSize,
                 defaultSettings = new SquadSettings { soldierMargin = authoring.SoldierMargin, squadResolution = authoring.SquadResolution }
             });
         }
     }
 
-    [FormerlySerializedAs("_animResolution ")] public int2 AnimResolution = new(1,1);
-    [FormerlySerializedAs("_soldierView")] public GameObject SoldierView;
+    public SpriteAnimatedRendererAuthoring SoldierView;
     [FormerlySerializedAs("_squadResolution")] public int2 SquadResolution;
     [FormerlySerializedAs("_soldierMargin")] public float2 SoldierMargin;
-
-    public float2 VisualSize => SoldierView.TryGetComponent<SpriteRendererAuthoring>(out var authoring) ? authoring.VisualSize : new(1f);
 }
