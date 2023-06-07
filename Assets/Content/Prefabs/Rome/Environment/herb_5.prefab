@@ -44,20 +44,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b69774b53a53ba948b59b4d73ac17c8c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ExcludeUnityTransformComponents: 1
-  _sprite: {fileID: -1284998397, guid: e0da980a8ad9fe5489e70b1a6db18f97, type: 3}
-  _spriteRenderData:
-    Material: {fileID: 2100000, guid: d84d30a8fe326be4f98378dcb774dabf, type: 2}
-    PropertiesSet: {fileID: 11400000, guid: 99d3374c56bc41b408704563b4c0e25e, type: 2}
-    animationSet: {fileID: 11400000, guid: 7e08c69b054bf874eb7a3a0792460244, type: 2}
-  scale:
-    x: 1
-    y: 1
-  _overrideSpriteTexture: 1
-  _pivot:
-    x: 0.5
-    y: 0
-  _disableSorting: 0
-  _staticSorting: 1
-  _sortingIndex: 0
-  _sortingLayer: 0
+  Sprite: {fileID: -1284998397, guid: e0da980a8ad9fe5489e70b1a6db18f97, type: 3}
+  RegisterSpriteData:
+    SpriteRenderData:
+      Material: {fileID: 2100000, guid: d84d30a8fe326be4f98378dcb774dabf, type: 2}
+      PropertiesSet: {fileID: 11400000, guid: 99d3374c56bc41b408704563b4c0e25e, type: 2}
+  OverrideTextureFromSprite: 1
+  RenderSettings:
+    Pivot:
+      x: 0.5
+      y: 0
+    Size:
+      x: 1
+      y: 1
+    LockSize: 0
+    DrawMode: 0
+    TilingAndOffset:
+      x: 1
+      y: 1
+      z: 0
+      w: 0
+    Flip:
+      x: 0
+      y: 0
+  Sorting:
+    StaticSorting: 1
+    SortingIndex: 0
+    SortingLayer: -1936207431

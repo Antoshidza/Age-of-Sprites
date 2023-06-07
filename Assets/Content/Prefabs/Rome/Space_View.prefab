@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &1589009363141025679
+--- !u!1 &2922259383369406666
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,43 +8,44 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1589009363141025682}
-  - component: {fileID: 1589009363141025678}
+  - component: {fileID: 422165138672872100}
+  - component: {fileID: 7072648752234544226}
+  - component: {fileID: 1810660913803853958}
   m_Layer: 0
-  m_Name: rock_3
+  m_Name: Space_View
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &1589009363141025682
+--- !u!4 &422165138672872100
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1589009363141025679}
+  m_GameObject: {fileID: 2922259383369406666}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.03, y: -0.448, z: 0}
+  m_LocalPosition: {x: -0.02, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 29
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1589009363141025678
+--- !u!114 &7072648752234544226
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1589009363141025679}
+  m_GameObject: {fileID: 2922259383369406666}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b69774b53a53ba948b59b4d73ac17c8c, type: 3}
+  m_Script: {fileID: 11500000, guid: be769d94253e895418ce7434194ba34e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Sprite: {fileID: 21300000, guid: c3d92d4c7303a964985e9836d9e9f41e, type: 3}
+  Sprite: {fileID: 21300000, guid: a058ffc2ab6136b45a401a40c99c7aa5, type: 3}
   RegisterSpriteData:
     SpriteRenderData:
       Material: {fileID: 2100000, guid: d84d30a8fe326be4f98378dcb774dabf, type: 2}
@@ -53,12 +54,12 @@ MonoBehaviour:
   RenderSettings:
     Pivot:
       x: 0.5
-      y: 0
+      y: 0.5
     Size:
-      x: 1
-      y: 1
+      x: 3.3
+      y: 3.4160159
     LockSize: 0
-    DrawMode: 0
+    DrawMode: 1
     TilingAndOffset:
       x: 1
       y: 1
@@ -68,6 +69,22 @@ MonoBehaviour:
       x: 0
       y: 0
   Sorting:
-    StaticSorting: 1
+    StaticSorting: 0
     SortingIndex: 0
-    SortingLayer: -1936207431
+    SortingLayer: 1566039685
+  AnimationAuthoringModule:
+    AnimationSet: {fileID: 11400000, guid: b059fb89b8b5e5a4da82c5550a5cd866, type: 2}
+    InitialAnimationIndex: 0
+--- !u!114 &1810660913803853958
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2922259383369406666}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86a61fe595234dff9c7db8cd28e6b82b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _spriteAuthoring: {fileID: 7072648752234544226}
