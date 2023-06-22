@@ -14,7 +14,7 @@ public partial struct SquadMoveSystem : ISystem
     {
         public float2 SoldierSize;
         [ReadOnly] public BufferTypeHandle<SoldierLink> SoldierLink_BTH_RO;
-        [ReadOnly] public ComponentTypeHandle<WorldPosition2D> WorldPos2D_CTH_RO;
+        [ReadOnly] public ComponentTypeHandle<LocalToWorld2D> LTW2D_CTH_RO;
         [ReadOnly] public ComponentTypeHandle<SquadSettings> SquadSettings_CTH_RO;
         public ComponentTypeHandle<PrevWorldPosition2D> PrevPos_CTH_RW;
         [NativeDisableParallelForRestriction][WriteOnly] public ComponentLookup<Destination> Destination_CL_WO;
@@ -31,17 +31,17 @@ public partial struct SquadMoveSystem : ISystem
 
         public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
         {
-            var positions = chunk.GetNativeArray(ref WorldPos2D_CTH_RO);
+            var ltw2D = chunk.GetNativeArray(ref LTW2D_CTH_RO);
             var soldierBufferAccessor = chunk.GetBufferAccessor(ref SoldierLink_BTH_RO);
 
-            if (chunk.DidChange(ref WorldPos2D_CTH_RO, LastSystemVersion))
+            if (chunk.DidChange(ref LTW2D_CTH_RO, LastSystemVersion))
             {
                 var prevPositions = chunk.GetNativeArray(ref PrevPos_CTH_RW);
 
                 var squadSettingsArray = chunk.GetNativeArray(ref SquadSettings_CTH_RO);
-                for (int squadIndex = 0; squadIndex < positions.Length; squadIndex++)
+                for (int squadIndex = 0; squadIndex < ltw2D.Length; squadIndex++)
                 {
-                    var pos = positions[squadIndex].value;
+                    var pos = ltw2D[squadIndex].Position;
                     if (math.any(pos != prevPositions[squadIndex].value))
                     {
                         MoveSoldiers(squadSettingsArray[squadIndex], SoldierSize, soldierBufferAccessor[squadIndex], pos, ref Destination_CL_WO);
@@ -52,8 +52,8 @@ public partial struct SquadMoveSystem : ISystem
             else if (chunk.DidChange(ref SoldierLink_BTH_RO, LastSystemVersion))
             {
                 var squadSettingsArray = chunk.GetNativeArray(ref SquadSettings_CTH_RO);
-                for (int squadIndex = 0; squadIndex < positions.Length; squadIndex++)
-                    MoveSoldiers(squadSettingsArray[squadIndex], SoldierSize, soldierBufferAccessor[squadIndex], positions[squadIndex].value, ref Destination_CL_WO);
+                for (int squadIndex = 0; squadIndex < ltw2D.Length; squadIndex++)
+                    MoveSoldiers(squadSettingsArray[squadIndex], SoldierSize, soldierBufferAccessor[squadIndex], ltw2D[squadIndex].Position, ref Destination_CL_WO);
             }
         }
     }
@@ -64,9 +64,9 @@ public partial struct SquadMoveSystem : ISystem
         public float2 SoldierSize;
         [NativeDisableParallelForRestriction] public ComponentLookup<Destination> Destination_CL;
 
-        private void Execute(in WorldPosition2D pos, in DynamicBuffer<SoldierLink> soldiersBuffer, in SquadSettings squadSettings)
+        private void Execute(in LocalToWorld2D ltw, in DynamicBuffer<SoldierLink> soldiersBuffer, in SquadSettings squadSettings)
         {
-            MoveJob.MoveSoldiers(squadSettings, SoldierSize, soldiersBuffer, pos.value, ref Destination_CL);
+            MoveJob.MoveSoldiers(squadSettings, SoldierSize, soldiersBuffer, ltw.Position, ref Destination_CL);
         }
     }
     
@@ -115,7 +115,7 @@ public partial struct SquadMoveSystem : ISystem
                 LastSystemVersion = state.LastSystemVersion,
                 SoldierSize = soldierSize,
                 SquadSettings_CTH_RO = SystemAPI.GetComponentTypeHandle<SquadSettings>(true),
-                WorldPos2D_CTH_RO = SystemAPI.GetComponentTypeHandle<WorldPosition2D>(true),
+                LTW2D_CTH_RO = SystemAPI.GetComponentTypeHandle<LocalToWorld2D>(true),
                 Destination_CL_WO = SystemAPI.GetComponentLookup<Destination>(false),
                 PrevPos_CTH_RW = SystemAPI.GetComponentTypeHandle<PrevWorldPosition2D>(false),
                 SoldierLink_BTH_RO = SystemAPI.GetBufferTypeHandle<SoldierLink>(true)

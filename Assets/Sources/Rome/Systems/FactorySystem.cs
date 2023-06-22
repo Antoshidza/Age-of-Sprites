@@ -12,19 +12,25 @@ public partial struct FactorySystem : ISystem
         public float DeltaTime;
         public EntityCommandBuffer.ParallelWriter ECB;
 
-        private void Execute([ChunkIndexInQuery] int chunkIndex, ref FactoryTimer timer, in FactoryData data)
+        private void Execute([ChunkIndexInQuery] int chunkIndex, ref FactoryTimer timer, in FactoryData factoryData)
         {
             timer.value -= DeltaTime;
 
             if (timer.value <= 0)
             {
-                timer.value += data.duration;
-                var instanceEntities = new NativeArray<Entity>(data.count, Allocator.Temp);
-                ECB.Instantiate(chunkIndex, data.prefab, instanceEntities);
+                timer.value += factoryData.duration;
+                var instanceEntities = new NativeArray<Entity>(factoryData.count, Allocator.Temp);
+                ECB.Instantiate(chunkIndex, factoryData.prefab, instanceEntities);
                 for (int i = 0; i < instanceEntities.Length; i++)
-                    ECB.SetComponent(chunkIndex, instanceEntities[i], new WorldPosition2D { value = data.instantiatePos });
+                    ECB.SetComponent(chunkIndex, instanceEntities[i], LocalTransform2D.FromPosition(factoryData.instantiatePos));
             }
         }
+    }
+
+    [BurstCompile]
+    public void OnCreate(ref SystemState state)
+    {
+        state.RequireForUpdate<EndSimulationEntityCommandBufferSystem.Singleton>();
     }
     
     [BurstCompile]

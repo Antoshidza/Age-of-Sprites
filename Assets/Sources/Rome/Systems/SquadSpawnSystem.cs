@@ -17,11 +17,15 @@ public partial struct SquadSpawnSystem : ISystem
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
-        var typeArray = new NativeArray<ComponentType>(4, Allocator.Temp);
-        typeArray[0] = ComponentType.ReadOnly<WorldPosition2D>();
-        typeArray[1] = ComponentType.ReadOnly<PrevWorldPosition2D>();
-        typeArray[2] = ComponentType.ReadOnly<SoldierLink>();
-        typeArray[3] = ComponentType.ReadOnly<RequireSoldier>();
+        state.RequireForUpdate<SquadDefaultSettings>();
+        state.RequireForUpdate<EndSimulationEntityCommandBufferSystem.Singleton>();
+        
+        var typeArray = new NativeArray<ComponentType>(5, Allocator.Temp);
+        typeArray[0] = ComponentType.ReadOnly<LocalTransform2D>();
+        typeArray[1] = ComponentType.ReadOnly<LocalToWorld2D>();
+        typeArray[2] = ComponentType.ReadOnly<PrevWorldPosition2D>();
+        typeArray[3] = ComponentType.ReadOnly<SoldierLink>();
+        typeArray[4] = ComponentType.ReadOnly<RequireSoldier>();
 
         var systemData = new SystemData{ SquadArchetype = state.EntityManager.CreateArchetype(typeArray) };
 

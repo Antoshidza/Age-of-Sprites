@@ -34,7 +34,7 @@ public partial struct DrawSquadInSceneViewSystem : ISystem
         _squadQuery = state.GetEntityQuery
         (
             typeof(SquadSettings),
-            typeof(WorldPosition2D)
+            typeof(LocalTransform2D)
         );
         state.RequireForUpdate<EnableSquadDrawing>();
     }
@@ -50,13 +50,13 @@ public partial struct DrawSquadInSceneViewSystem : ISystem
 
         var soldierSize = SystemAPI.GetComponent<Scale2D>(squadGlobalSettings.soldierPrefab).value;
         var settings = _squadQuery.ToComponentDataListAsync<SquadSettings>(Allocator.TempJob, out var settings_GatherHandle);
-        var positions = _squadQuery.ToComponentDataListAsync<WorldPosition2D>(Allocator.TempJob, out var poisitions_GatherHandle);
+        var transforms = _squadQuery.ToComponentDataListAsync<LocalTransform2D>(Allocator.TempJob, out var poisitions_GatherHandle);
 
         JobHandle.CombineDependencies(settings_GatherHandle, poisitions_GatherHandle).Complete();
 
         for (int squadIndex = 0; squadIndex < settings.Length; squadIndex++)
         {
-            var squadPos = positions[squadIndex].value;
+            var squadPos = transforms[squadIndex].Position;
             var setting = settings[squadIndex];
             var squadSize = SquadDefaultSettings.GetSquadSize(setting.squadResolution, soldierSize, setting.soldierMargin);
             var rect = new float2x2(squadPos, squadPos + squadSize);
@@ -75,7 +75,7 @@ public partial struct DrawSquadInSceneViewSystem : ISystem
         }
 
         settings.Dispose();
-        positions.Dispose();
+        transforms.Dispose();
     }
 }
 #endif

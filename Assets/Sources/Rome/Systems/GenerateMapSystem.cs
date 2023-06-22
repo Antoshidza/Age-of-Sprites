@@ -25,7 +25,7 @@ public partial struct GenerateMapSystem : ISystem
             {
                 var rand = PosRands[_threadIndex];
                 var rockEntity = ECB.Instantiate(i, Rocks[rand.NextInt(0, Rocks.Length)]);
-                ECB.SetComponent(i, rockEntity, new WorldPosition2D { value = rand.NextFloat2(MapSize.c0, MapSize.c1) });
+                ECB.SetComponent(i, rockEntity, LocalTransform2D.FromPosition(rand.NextFloat2(MapSize.c0, MapSize.c1)));
                 PosRands[_threadIndex] = rand;
             }
         }
@@ -35,9 +35,11 @@ public partial struct GenerateMapSystem : ISystem
         public Random Rand;
     }
 
+    [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
-        _ = state.EntityManager.AddComponentData(state.SystemHandle, new SystemData { Rand = new Random((uint)System.DateTime.Now.Ticks) });
+        state.RequireForUpdate<EndSimulationEntityCommandBufferSystem.Singleton>();
+        _ = state.EntityManager.AddComponentData(state.SystemHandle, new SystemData { Rand = new Random((uint)/*System.DateTime.Now.Ticks*/1) });
     }
     
     [BurstCompile]

@@ -18,7 +18,7 @@ public partial struct MoveToDestinationSystem : ISystem
         [ReadOnly] public EntityTypeHandle EntityTypeHandle;
         public ComponentTypeHandle<MoveTimer> MoveTimer_CTH_RW;
         [ReadOnly] public ComponentTypeHandle<MoveSpeed> MoveSpeed_CTH_RO;
-        [ReadOnly] public ComponentTypeHandle<WorldPosition2D> WorldPosition2D_CTH_RO;
+        [ReadOnly] public ComponentTypeHandle<LocalToWorld2D> LTW2D_CTH_RO;
         [ReadOnly] public ComponentTypeHandle<Destination> Destionation_CTH_RO;
         public ComponentTypeHandle<MovingTag> MovingTag_CTH_RW;
         public uint LastSystemVersion;
@@ -29,14 +29,14 @@ public partial struct MoveToDestinationSystem : ISystem
                 || chunk.DidChange(ref MoveSpeed_CTH_RO, LastSystemVersion))
             {
                 var entities = chunk.GetNativeArray(EntityTypeHandle);
-                var worldPositions = chunk.GetNativeArray(ref WorldPosition2D_CTH_RO);
+                var ltw2D = chunk.GetNativeArray(ref LTW2D_CTH_RO);
                 var moveSpeeds = chunk.GetNativeArray(ref MoveSpeed_CTH_RO);
                 var destinations = chunk.GetNativeArray(ref Destionation_CTH_RO);
                 var timers = chunk.GetNativeArray(ref MoveTimer_CTH_RW);
 
                 for (int entityIndex = 0; entityIndex < entities.Length; entityIndex++)
                 {
-                    var distance = math.length(destinations[entityIndex].value - worldPositions[entityIndex].value);
+                    var distance = math.length(destinations[entityIndex].value - ltw2D[entityIndex].Position);
                     if (distance > Threshold)
                     {
                         timers[entityIndex] = new MoveTimer { RemainingTime = GetRemainingTime(distance, moveSpeeds[entityIndex].value) };
@@ -60,11 +60,11 @@ public partial struct MoveToDestinationSystem : ISystem
         public float DeltaTime;
         [NativeDisableParallelForRestriction] public ComponentLookup<MovingTag> MovingTag_CL_RW;
 
-        private void Execute(Entity entity, ref WorldPosition2D pos, ref MoveTimer timer, in Destination destination)
+        private void Execute(Entity entity, ref LocalTransform2D transform, ref MoveTimer timer, in Destination destination)
         {
             var remainingDelta = math.max(timer.RemainingTime, DeltaTime - timer.RemainingTime);
             // move pos in a direction of current destination by passed frac of whole remaining move time
-            pos.value += (destination.value - pos.value) * DeltaTime / remainingDelta;
+            transform.Position += (destination.value - transform.Position) * DeltaTime / remainingDelta;
             timer.RemainingTime = math.max(0, timer.RemainingTime - DeltaTime);
 
             if (timer.RemainingTime == 0f)
@@ -83,7 +83,7 @@ public partial struct MoveToDestinationSystem : ISystem
     {
         var queryBuilder = new EntityQueryBuilder(Allocator.Temp)
             .WithAll<MoveSpeed>()
-            .WithAll<WorldPosition2D>()
+            .WithAll<LocalToWorld2D>()
             .WithAll<Destination>();
         var systemData = new SystemData{ MovableQuery = state.GetEntityQuery(queryBuilder) };
         _ = state.EntityManager.AddComponentData(state.SystemHandle, systemData);
@@ -102,7 +102,7 @@ public partial struct MoveToDestinationSystem : ISystem
             EntityTypeHandle = SystemAPI.GetEntityTypeHandle(),
             MoveTimer_CTH_RW = SystemAPI.GetComponentTypeHandle<MoveTimer>(false),
             MoveSpeed_CTH_RO = SystemAPI.GetComponentTypeHandle<MoveSpeed>(true),
-            WorldPosition2D_CTH_RO = SystemAPI.GetComponentTypeHandle<WorldPosition2D>(true),
+            LTW2D_CTH_RO = SystemAPI.GetComponentTypeHandle<LocalToWorld2D>(true),
             Destionation_CTH_RO = SystemAPI.GetComponentTypeHandle<Destination>(true),
             MovingTag_CTH_RW = SystemAPI.GetComponentTypeHandle<MovingTag>(false),
             LastSystemVersion = state.LastSystemVersion
