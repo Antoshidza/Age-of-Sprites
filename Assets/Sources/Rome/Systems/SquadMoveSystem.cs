@@ -37,8 +37,8 @@ public partial struct SquadMoveSystem : ISystem
             if (chunk.DidChange(ref LTW2D_CTH_RO, LastSystemVersion))
             {
                 var prevPositions = chunk.GetNativeArray(ref PrevPos_CTH_RW);
-
                 var squadSettingsArray = chunk.GetNativeArray(ref SquadSettings_CTH_RO);
+                
                 for (int squadIndex = 0; squadIndex < ltw2D.Length; squadIndex++)
                 {
                     var pos = ltw2D[squadIndex].Position;
@@ -80,7 +80,7 @@ public partial struct SquadMoveSystem : ISystem
     public void OnCreate(ref SystemState state)
     {
         var queryBuilder = new EntityQueryBuilder(Allocator.Temp)
-            .WithAll<SoldierLink>();
+            .WithAll<SoldierLink, LocalToWorld2D, PrevWorldPosition2D, SquadSettings>();
 
         _ = state.EntityManager.AddComponentData(state.SystemHandle, new SystemData { SquadQuery = state.GetEntityQuery(queryBuilder) });
 
