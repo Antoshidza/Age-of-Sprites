@@ -11,9 +11,8 @@ public class SquadAuthoring : MonoBehaviour
         public override void Bake(SquadAuthoring authoring)
         {
             var entity = GetEntity(TransformUsageFlags.None);
-            var pos = MathHelper.float2(authoring.transform.position);
-            AddComponent(entity, LocalTransform2D.FromPosition(pos));
-            AddComponent(entity, new LocalToWorld2D());
+            var pos = new float3(authoring.transform.position).xy;
+            AddComponent(entity, new WorldPosition2D { Value = pos });
             AddComponent(entity, new PrevWorldPosition2D { value = pos });
             AddComponent(entity, new SquadSettings { squadResolution = authoring.Resolution, soldierMargin = authoring.SoldierMargin });
             AddComponent(entity, new RequireSoldier { count = authoring.Resolution.x * authoring.Resolution.y });

@@ -4,6 +4,7 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
+using Unity.Transforms;
 using UnityEditor;
 using UnityEngine;
 
@@ -34,13 +35,9 @@ public partial struct DrawSquadInSceneViewSystem : ISystem
         _squadQuery = state.GetEntityQuery
         (
             typeof(SquadSettings),
-            typeof(LocalTransform2D)
+            typeof(WorldPosition2D)
         );
         state.RequireForUpdate<EnableSquadDrawing>();
-    }
-
-    public void OnDestroy(ref SystemState state)
-    {
     }
 
     public void OnUpdate(ref SystemState state)
@@ -50,13 +47,13 @@ public partial struct DrawSquadInSceneViewSystem : ISystem
 
         var soldierSize = SystemAPI.GetComponent<Scale2D>(squadGlobalSettings.soldierPrefab).value;
         var settings = _squadQuery.ToComponentDataListAsync<SquadSettings>(Allocator.TempJob, out var settings_GatherHandle);
-        var transforms = _squadQuery.ToComponentDataListAsync<LocalTransform2D>(Allocator.TempJob, out var poisitions_GatherHandle);
+        var positions = _squadQuery.ToComponentDataListAsync<WorldPosition2D>(Allocator.TempJob, out var poisitions_GatherHandle);
 
         JobHandle.CombineDependencies(settings_GatherHandle, poisitions_GatherHandle).Complete();
 
         for (int squadIndex = 0; squadIndex < settings.Length; squadIndex++)
         {
-            var squadPos = transforms[squadIndex].Position;
+            var squadPos = positions[squadIndex].Value;
             var setting = settings[squadIndex];
             var squadSize = SquadDefaultSettings.GetSquadSize(setting.squadResolution, soldierSize, setting.soldierMargin);
             var rect = new float2x2(squadPos, squadPos + squadSize);
@@ -75,7 +72,7 @@ public partial struct DrawSquadInSceneViewSystem : ISystem
         }
 
         settings.Dispose();
-        transforms.Dispose();
+        positions.Dispose();
     }
 }
 #endif

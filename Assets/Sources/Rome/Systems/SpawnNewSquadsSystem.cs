@@ -24,11 +24,10 @@ public partial struct SpawnNewSquadsSystem : ISystem
                 typeof(RequireSoldier),
                 typeof(SquadSettings),
 
-                typeof(LocalTransform2D),
-                typeof(LocalToWorld2D),
+                typeof(WorldPosition2D),
                 typeof(PrevWorldPosition2D)
             ),
-            Rand = new Random((uint)1/*System.DateTime.Now.Ticks*/)
+            Rand = new Random(1u)
         };
         _ = state.EntityManager.AddComponentData(state.SystemHandle, systemData);
     }
@@ -54,7 +53,7 @@ public partial struct SpawnNewSquadsSystem : ISystem
             soldierMargin = squadDefaultSettings.defaultSettings.soldierMargin
         });
         state.EntityManager.SetComponentData(squadEntity, new RequireSoldier { count = soldierCount });
-        state.EntityManager.SetComponentData(squadEntity, LocalTransform2D.FromPosition(pos));
+        state.EntityManager.SetComponentData(squadEntity, new WorldPosition2D { Value = pos });
         state.EntityManager.SetComponentData(squadEntity, new PrevWorldPosition2D { value = pos });
 
         SystemAPI.SetComponent(state.SystemHandle, systemData);

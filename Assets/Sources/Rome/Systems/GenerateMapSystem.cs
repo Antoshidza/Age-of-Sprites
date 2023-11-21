@@ -1,11 +1,11 @@
-﻿using NSprites;
-using Unity.Burst;
+﻿using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Jobs.LowLevel.Unsafe;
 using Unity.Mathematics;
+using Unity.Transforms;
 
 [BurstCompile]
 public partial struct GenerateMapSystem : ISystem
@@ -25,7 +25,7 @@ public partial struct GenerateMapSystem : ISystem
             {
                 var rand = PosRands[_threadIndex];
                 var rockEntity = ECB.Instantiate(i, Rocks[rand.NextInt(0, Rocks.Length)]);
-                ECB.SetComponent(i, rockEntity, LocalTransform2D.FromPosition(rand.NextFloat2(MapSize.c0, MapSize.c1)));
+                ECB.SetComponent(i, rockEntity, LocalTransform.FromPosition(rand.NextFloat2(MapSize.c0, MapSize.c1).ToFloat3()));
                 PosRands[_threadIndex] = rand;
             }
         }
@@ -39,7 +39,7 @@ public partial struct GenerateMapSystem : ISystem
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<EndSimulationEntityCommandBufferSystem.Singleton>();
-        _ = state.EntityManager.AddComponentData(state.SystemHandle, new SystemData { Rand = new Random((uint)/*System.DateTime.Now.Ticks*/1) });
+        _ = state.EntityManager.AddComponentData(state.SystemHandle, new SystemData { Rand = new Random(1u) });
     }
     
     [BurstCompile]

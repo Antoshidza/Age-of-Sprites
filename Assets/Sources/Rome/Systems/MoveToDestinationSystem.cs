@@ -1,10 +1,10 @@
-﻿using NSprites;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using Unity.Burst;
 using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Transforms;
 
 [BurstCompile]
 public partial struct MoveToDestinationSystem : ISystem
@@ -18,25 +18,25 @@ public partial struct MoveToDestinationSystem : ISystem
         [ReadOnly] public EntityTypeHandle EntityTypeHandle;
         public ComponentTypeHandle<MoveTimer> MoveTimer_CTH_RW;
         [ReadOnly] public ComponentTypeHandle<MoveSpeed> MoveSpeed_CTH_RO;
-        [ReadOnly] public ComponentTypeHandle<LocalToWorld2D> LTW2D_CTH_RO;
-        [ReadOnly] public ComponentTypeHandle<Destination> Destionation_CTH_RO;
+        [ReadOnly] public ComponentTypeHandle<LocalToWorld> LTW_CTH_RO;
+        [ReadOnly] public ComponentTypeHandle<Destination> Destination_CTH_RO;
         public ComponentTypeHandle<MovingTag> MovingTag_CTH_RW;
         public uint LastSystemVersion;
 
         public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
         {
-            if (chunk.DidChange(ref Destionation_CTH_RO, LastSystemVersion)
+            if (chunk.DidChange(ref Destination_CTH_RO, LastSystemVersion)
                 || chunk.DidChange(ref MoveSpeed_CTH_RO, LastSystemVersion))
             {
                 var entities = chunk.GetNativeArray(EntityTypeHandle);
-                var ltw2D = chunk.GetNativeArray(ref LTW2D_CTH_RO);
+                var ltw = chunk.GetNativeArray(ref LTW_CTH_RO);
                 var moveSpeeds = chunk.GetNativeArray(ref MoveSpeed_CTH_RO);
-                var destinations = chunk.GetNativeArray(ref Destionation_CTH_RO);
+                var destinations = chunk.GetNativeArray(ref Destination_CTH_RO);
                 var timers = chunk.GetNativeArray(ref MoveTimer_CTH_RW);
 
                 for (int entityIndex = 0; entityIndex < entities.Length; entityIndex++)
                 {
-                    var distance = math.length(destinations[entityIndex].value - ltw2D[entityIndex].Position);
+                    var distance = math.length(destinations[entityIndex].Value - ltw[entityIndex].Position.xy);
                     if (distance > Threshold)
                     {
                         timers[entityIndex] = new MoveTimer { RemainingTime = GetRemainingTime(distance, moveSpeeds[entityIndex].value) };
@@ -60,11 +60,11 @@ public partial struct MoveToDestinationSystem : ISystem
         public float DeltaTime;
         [NativeDisableParallelForRestriction] public ComponentLookup<MovingTag> MovingTag_CL_RW;
 
-        private void Execute(Entity entity, ref LocalTransform2D transform, ref MoveTimer timer, in Destination destination)
+        private void Execute(Entity entity, ref LocalTransform transform, ref MoveTimer timer, in Destination destination)
         {
             var remainingDelta = math.max(timer.RemainingTime, DeltaTime - timer.RemainingTime);
             // move pos in a direction of current destination by passed frac of whole remaining move time
-            transform.Position += (destination.value - transform.Position) * DeltaTime / remainingDelta;
+            transform.Position += ((destination.Value - transform.Position.xy) * DeltaTime / remainingDelta).ToFloat3();
             timer.RemainingTime = math.max(0, timer.RemainingTime - DeltaTime);
 
             if (timer.RemainingTime == 0f)
@@ -83,7 +83,7 @@ public partial struct MoveToDestinationSystem : ISystem
     {
         var queryBuilder = new EntityQueryBuilder(Allocator.Temp)
             .WithAll<MoveSpeed>()
-            .WithAll<LocalToWorld2D>()
+            .WithAll<LocalToWorld>()
             .WithAll<Destination>();
         var systemData = new SystemData{ MovableQuery = state.GetEntityQuery(queryBuilder) };
         _ = state.EntityManager.AddComponentData(state.SystemHandle, systemData);
@@ -102,8 +102,8 @@ public partial struct MoveToDestinationSystem : ISystem
             EntityTypeHandle = SystemAPI.GetEntityTypeHandle(),
             MoveTimer_CTH_RW = SystemAPI.GetComponentTypeHandle<MoveTimer>(false),
             MoveSpeed_CTH_RO = SystemAPI.GetComponentTypeHandle<MoveSpeed>(true),
-            LTW2D_CTH_RO = SystemAPI.GetComponentTypeHandle<LocalToWorld2D>(true),
-            Destionation_CTH_RO = SystemAPI.GetComponentTypeHandle<Destination>(true),
+            LTW_CTH_RO = SystemAPI.GetComponentTypeHandle<LocalToWorld>(true),
+            Destination_CTH_RO = SystemAPI.GetComponentTypeHandle<Destination>(true),
             MovingTag_CTH_RW = SystemAPI.GetComponentTypeHandle<MovingTag>(false),
             LastSystemVersion = state.LastSystemVersion
         };

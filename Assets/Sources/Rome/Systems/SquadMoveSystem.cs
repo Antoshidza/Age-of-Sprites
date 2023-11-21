@@ -5,6 +5,7 @@ using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Transforms;
 
 [BurstCompile]
 public partial struct SquadMoveSystem : ISystem
@@ -14,7 +15,7 @@ public partial struct SquadMoveSystem : ISystem
     {
         public float2 SoldierSize;
         [ReadOnly] public BufferTypeHandle<SoldierLink> SoldierLink_BTH_RO;
-        [ReadOnly] public ComponentTypeHandle<LocalToWorld2D> LTW2D_CTH_RO;
+        [ReadOnly] public ComponentTypeHandle<WorldPosition2D> WorldPosition2D_RO;
         [ReadOnly] public ComponentTypeHandle<SquadSettings> SquadSettings_CTH_RO;
         public ComponentTypeHandle<PrevWorldPosition2D> PrevPos_CTH_RW;
         [NativeDisableParallelForRestriction][WriteOnly] public ComponentLookup<Destination> Destination_CL_WO;
@@ -25,35 +26,35 @@ public partial struct SquadMoveSystem : ISystem
         {
             var perSoldierOffset = (2 * squadSettings.soldierMargin + 1f) * soldierSize;
 
-            for (int soldierIndex = 0; soldierIndex < soldiersBuffer.Length; soldierIndex++)
-                destination_CL_WO[soldiersBuffer[soldierIndex].entity] = new Destination { value = pos + (perSoldierOffset * new float2(soldierIndex % squadSettings.squadResolution.x + .5f, soldierIndex / squadSettings.squadResolution.x)) };
+            for (var soldierIndex = 0; soldierIndex < soldiersBuffer.Length; soldierIndex++)
+                destination_CL_WO[soldiersBuffer[soldierIndex].entity] = new Destination { Value = pos + (perSoldierOffset * new float2(soldierIndex % squadSettings.squadResolution.x + .5f, soldierIndex / squadSettings.squadResolution.x)) };
         }
 
         public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
         {
-            var ltw2D = chunk.GetNativeArray(ref LTW2D_CTH_RO);
+            var worldPositions = chunk.GetNativeArray(ref WorldPosition2D_RO);
             var soldierBufferAccessor = chunk.GetBufferAccessor(ref SoldierLink_BTH_RO);
 
-            if (chunk.DidChange(ref LTW2D_CTH_RO, LastSystemVersion))
+            if (chunk.DidChange(ref WorldPosition2D_RO, LastSystemVersion))
             {
                 var prevPositions = chunk.GetNativeArray(ref PrevPos_CTH_RW);
                 var squadSettingsArray = chunk.GetNativeArray(ref SquadSettings_CTH_RO);
                 
-                for (int squadIndex = 0; squadIndex < ltw2D.Length; squadIndex++)
+                for (int squadIndex = 0; squadIndex < worldPositions.Length; squadIndex++)
                 {
-                    var pos = ltw2D[squadIndex].Position;
-                    if (math.any(pos != prevPositions[squadIndex].value))
+                    var pos2D = worldPositions[squadIndex].Value;
+                    if (math.any(pos2D != prevPositions[squadIndex].value))
                     {
-                        MoveSoldiers(squadSettingsArray[squadIndex], SoldierSize, soldierBufferAccessor[squadIndex], pos, ref Destination_CL_WO);
-                        prevPositions[squadIndex] = new PrevWorldPosition2D { value = pos };
+                        MoveSoldiers(squadSettingsArray[squadIndex], SoldierSize, soldierBufferAccessor[squadIndex], pos2D, ref Destination_CL_WO);
+                        prevPositions[squadIndex] = new PrevWorldPosition2D { value = pos2D };
                     }
                 }
             }
             else if (chunk.DidChange(ref SoldierLink_BTH_RO, LastSystemVersion))
             {
                 var squadSettingsArray = chunk.GetNativeArray(ref SquadSettings_CTH_RO);
-                for (int squadIndex = 0; squadIndex < ltw2D.Length; squadIndex++)
-                    MoveSoldiers(squadSettingsArray[squadIndex], SoldierSize, soldierBufferAccessor[squadIndex], ltw2D[squadIndex].Position, ref Destination_CL_WO);
+                for (int squadIndex = 0; squadIndex < worldPositions.Length; squadIndex++)
+                    MoveSoldiers(squadSettingsArray[squadIndex], SoldierSize, soldierBufferAccessor[squadIndex], worldPositions[squadIndex].Value, ref Destination_CL_WO);
             }
         }
     }
@@ -64,9 +65,9 @@ public partial struct SquadMoveSystem : ISystem
         public float2 SoldierSize;
         [NativeDisableParallelForRestriction] public ComponentLookup<Destination> Destination_CL;
 
-        private void Execute(in LocalToWorld2D ltw, in DynamicBuffer<SoldierLink> soldiersBuffer, in SquadSettings squadSettings)
+        private void Execute(in LocalToWorld ltw, in DynamicBuffer<SoldierLink> soldiersBuffer, in SquadSettings squadSettings)
         {
-            MoveJob.MoveSoldiers(squadSettings, SoldierSize, soldiersBuffer, ltw.Position, ref Destination_CL);
+            MoveJob.MoveSoldiers(squadSettings, SoldierSize, soldiersBuffer, ltw.Position.xy, ref Destination_CL);
         }
     }
     
@@ -80,7 +81,7 @@ public partial struct SquadMoveSystem : ISystem
     public void OnCreate(ref SystemState state)
     {
         var queryBuilder = new EntityQueryBuilder(Allocator.Temp)
-            .WithAll<SoldierLink, LocalToWorld2D, PrevWorldPosition2D, SquadSettings>();
+            .WithAll<SoldierLink, WorldPosition2D, PrevWorldPosition2D, SquadSettings>();
 
         _ = state.EntityManager.AddComponentData(state.SystemHandle, new SystemData { SquadQuery = state.GetEntityQuery(queryBuilder) });
 
@@ -115,10 +116,10 @@ public partial struct SquadMoveSystem : ISystem
                 LastSystemVersion = state.LastSystemVersion,
                 SoldierSize = soldierSize,
                 SquadSettings_CTH_RO = SystemAPI.GetComponentTypeHandle<SquadSettings>(true),
-                LTW2D_CTH_RO = SystemAPI.GetComponentTypeHandle<LocalToWorld2D>(true),
                 Destination_CL_WO = SystemAPI.GetComponentLookup<Destination>(false),
                 PrevPos_CTH_RW = SystemAPI.GetComponentTypeHandle<PrevWorldPosition2D>(false),
-                SoldierLink_BTH_RO = SystemAPI.GetBufferTypeHandle<SoldierLink>(true)
+                SoldierLink_BTH_RO = SystemAPI.GetBufferTypeHandle<SoldierLink>(true),
+                WorldPosition2D_RO = SystemAPI.GetComponentTypeHandle<WorldPosition2D>(true)
             };
             state.Dependency = moveJob.ScheduleParallelByRef(systemData.SquadQuery, state.Dependency);
         }

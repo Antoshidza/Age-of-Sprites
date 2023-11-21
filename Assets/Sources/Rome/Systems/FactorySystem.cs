@@ -2,6 +2,7 @@
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Transforms;
 
 [BurstCompile]
 public partial struct FactorySystem : ISystem
@@ -22,7 +23,7 @@ public partial struct FactorySystem : ISystem
                 var instanceEntities = new NativeArray<Entity>(factoryData.count, Allocator.Temp);
                 ECB.Instantiate(chunkIndex, factoryData.prefab, instanceEntities);
                 for (int i = 0; i < instanceEntities.Length; i++)
-                    ECB.SetComponent(chunkIndex, instanceEntities[i], LocalTransform2D.FromPosition(factoryData.instantiatePos));
+                    ECB.SetComponent(chunkIndex, instanceEntities[i], LocalTransform.FromPosition(factoryData.instantiatePos.ToFloat3()));
             }
         }
     }
