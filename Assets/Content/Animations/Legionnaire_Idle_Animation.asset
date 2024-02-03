@@ -12,10 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3dc460e3eaeb97f48b48aa09fa988f09, type: 3}
   m_Name: Legionnaire_Idle_Animation
   m_EditorClassIdentifier: 
-  SpriteSheet: {fileID: 21300000, guid: 898aac7e69fb2e94a96989699ad9f692, type: 3}
+  SpriteSheet: {fileID: 21300000, guid: 50b0a985ccdcd7d47b6821a9a0f37895, type: 3}
   FrameCount:
-    x: 4
+    x: 10
     y: 1
+  FrameRange:
+    Offset: 6
+    Count: 4
   FrameDurations:
   - 1
   - 0.2
